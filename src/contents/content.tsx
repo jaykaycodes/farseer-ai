@@ -14,16 +14,7 @@ export const getStyle = () => {
 
 const PlasmoOverlay = () => {
   const [val, setVal] = useState('')
-  const [show, setShow] = useState(true)
-
-  useEffect(() => {
-    const recvMsg = (msg: unknown) => {
-      if (msg === PLUGIN_TOGGLE_MSG) setShow((s) => !s)
-    }
-
-    chrome.runtime.onMessage.addListener(recvMsg)
-    return () => chrome.runtime.onMessage.removeListener(recvMsg)
-  }, [])
+  const show = useContentVisibility()
 
   return (
     <div className="fixed top-4 right-4 rounded-md bg-black/50 p-1 font-sans text-gray-900 shadow backdrop-blur-lg">
@@ -45,3 +36,18 @@ const PlasmoOverlay = () => {
 }
 
 export default PlasmoOverlay
+
+const useContentVisibility = () => {
+  const [show, setShow] = useState(true)
+
+  useEffect(() => {
+    const recvMsg = (msg: unknown) => {
+      if (msg === PLUGIN_TOGGLE_MSG) setShow((s) => !s)
+    }
+
+    chrome.runtime.onMessage.addListener(recvMsg)
+    return () => chrome.runtime.onMessage.removeListener(recvMsg)
+  }, [])
+
+  return show
+}
