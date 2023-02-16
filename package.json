@@ -1,6 +1,7 @@
 {
-  "name": "data-portal",
-  "displayName": "Data portal",
+  "name": "farseer-ai",
+  "private": true,
+  "displayName": "Farseer AI",
   "version": "0.0.1",
   "description": "Web scraping with the help of AI",
   "author": "Jake Correa",
