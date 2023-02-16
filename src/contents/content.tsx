@@ -25,7 +25,7 @@ const PlasmoOverlay = () => {
       name: 'submit',
       body: {
         columns: val.split(',').map((col) => col.trim()),
-        content: 'some content',
+        content: document.querySelector('.titleline > a')?.textContent?.trim() || 'no content',
       },
     })
 
@@ -53,6 +53,9 @@ const PlasmoOverlay = () => {
           </div>
 
           <div className="mt-3 flex w-full justify-end">
+            <Button className="px-8" variant="ghost">
+              Reset
+            </Button>
             <Button className="px-8" onClick={handleSubmit}>
               Go!
             </Button>
