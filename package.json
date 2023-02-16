@@ -2,7 +2,7 @@
   "name": "data-portal",
   "displayName": "Data portal",
   "version": "0.0.1",
-  "description": "Web scraping with the power of AI",
+  "description": "Web scraping with the help of AI",
   "author": "Jake Correa",
   "scripts": {
     "dev": "plasmo dev",
@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "daisyui": "^2.50.0",
     "plasmo": "0.64.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -19,9 +20,23 @@
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.46.0",
+    "@typescript-eslint/parser": "^5.46.0",
+    "autoprefixer": "^10.4.13",
+    "eslint": "^8.29.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-simple-import-sort": "^9.0.0",
+    "eslint-plugin-tailwindcss": "^3.8.2",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "postcss": "^8.4.21",
     "prettier": "2.8.3",
-    "typescript": "4.9.4",
-    "@plasmohq/prettier-plugin-sort-imports": "3.6.1"
+    "tailwindcss": "^3.2.4",
+    "typescript": "4.9.4"
   },
   "manifest": {
     "host_permissions": [
