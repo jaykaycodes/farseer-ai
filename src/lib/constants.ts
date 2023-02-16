@@ -1,1 +1,1 @@
-export const PLUGIN_TOGGLE_MSG = 'toggle'
+export const TOGGLE_PLUGIN_VISIBILITY = 'TOGGLE_PLUGIN_VISIBILITY'

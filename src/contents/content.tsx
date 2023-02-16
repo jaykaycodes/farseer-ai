@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
+import { sendToBackground } from '@plasmohq/messaging'
 
+import { ISubmitRequest, ISubmitResponse, SubmitResponseSchema } from '~background/messages/submit'
+import { Button } from '~components/ui/Button'
 import { Label } from '~components/ui/Label'
 import { Textarea } from '~components/ui/Textarea'
-import { PLUGIN_TOGGLE_MSG } from '~lib/constants'
+import { TOGGLE_PLUGIN_VISIBILITY } from '~lib/constants'
 
 import cssText from 'data-text:~tailwind.css'
 
@@ -14,7 +17,26 @@ export const getStyle = () => {
 
 const PlasmoOverlay = () => {
   const [val, setVal] = useState('')
+  const [output, setOutput] = useState<string | null>(null)
   const show = useContentVisibility()
+
+  const handleSubmit = async () => {
+    const _res = await sendToBackground<ISubmitRequest, ISubmitResponse>({
+      name: 'submit',
+      body: {
+        columns: val.split(',').map((col) => col.trim()),
+        content: 'some content',
+      },
+    })
+
+    const res = SubmitResponseSchema.parse(_res)
+    if (res.error) {
+      console.error(res.error)
+      return
+    }
+
+    setOutput(res.message)
+  }
 
   return (
     <div className="fixed top-4 right-4 rounded-md bg-black/50 p-1 font-sans text-gray-900 shadow backdrop-blur-lg">
@@ -29,6 +51,20 @@ const PlasmoOverlay = () => {
               onChange={(e) => setVal(e.currentTarget.value)}
             />
           </div>
+
+          <div className="mt-3 flex w-full justify-end">
+            <Button className="px-8" onClick={handleSubmit}>
+              Go!
+            </Button>
+          </div>
+          {output && (
+            <div className="mt-5">
+              <Label htmlFor="columnNames">Output</Label>
+              <div className="h-36 w-full overflow-y-auto rounded-lg border border-dashed border-gray-400 p-2">
+                <pre>{output}</pre>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -42,7 +78,7 @@ const useContentVisibility = () => {
 
   useEffect(() => {
     const recvMsg = (msg: unknown) => {
-      if (msg === PLUGIN_TOGGLE_MSG) setShow((s) => !s)
+      if (msg === TOGGLE_PLUGIN_VISIBILITY) setShow((prev) => !prev)
     }
 
     chrome.runtime.onMessage.addListener(recvMsg)
