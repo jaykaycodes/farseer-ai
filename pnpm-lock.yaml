@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@plasmohq/messaging': ^0.1.1
   '@radix-ui/react-label': ^2.0.0
   '@types/chrome': 0.0.210
   '@types/node': 18.11.18
@@ -31,8 +32,10 @@ specifiers:
   tailwindcss: ^3.2.4
   tailwindcss-animate: ^1.0.5
   typescript: 4.9.4
+  zod: ^3.20.6
 
 dependencies:
+  '@plasmohq/messaging': 0.1.1_react@18.2.0
   '@radix-ui/react-label': 2.0.0_biqbaboplfbrettd7655fr4n2y
   class-variance-authority: 0.4.0_typescript@4.9.4
   lucide-react: 0.115.0_react@18.2.0
@@ -42,6 +45,7 @@ dependencies:
   react-hook-form: 7.43.1_react@18.2.0
   tailwind-merge: 1.9.1
   tailwindcss-animate: 1.0.5_tailwindcss@3.2.4
+  zod: 3.20.6
 
 devDependencies:
   '@types/chrome': 0.0.210
@@ -1599,6 +1603,19 @@ packages:
     resolution: {integrity: sha512-qoSRgQI5+IPBA3II7GDnc45bRycOZa7V7Gb/VrbE+ifXOplzyvdl7DWgH1OmUgzAoNtXcMcqUHILhhrTpX3PPw==}
     dev: false
 
+  /@plasmohq/messaging/0.1.1_react@18.2.0:
+    resolution: {integrity: sha512-ySt6em/vZUdCPCgHCPCp0i2dP6nKyB+uFbIwOGANPWhMCHEujIx9/cXrQVge2Ia19hOUDaZoGUPdvZls94Gvyg==}
+    peerDependencies:
+      react: ^16.8.6 || ^17 || ^18
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      '@types/webextension-polyfill': 0.10.0
+      react: 18.2.0
+      webextension-polyfill: 0.10.0
+    dev: false
+
   /@plasmohq/parcel-bundler/0.4.6:
     resolution: {integrity: sha512-R78/uzpMm1tVw4cQvbsLsrbrs7S+kIl6GcqJ9p2xzB1kyaSwq8A7Lk/jnt+btctcB5Bcxt7NXiLLJ5/DPNTNDA==}
     engines: {node: '>= 16.0.0', parcel: '>= 2.7.0'}
@@ -2172,6 +2189,10 @@ packages:
   /@types/semver/7.3.13:
     resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==}
     dev: true
+
+  /@types/webextension-polyfill/0.10.0:
+    resolution: {integrity: sha512-If4EcaHzYTqcbNMp/FdReVdRmLL/Te42ivnJII551bYjhX19bWem5m14FERCqdJA732OloGuxCRvLBvcMGsn4A==}
+    dev: false
 
   /@typescript-eslint/eslint-plugin/5.51.0_o6ewljbj247dtzzkns6ax7wsu4:
     resolution: {integrity: sha512-wcAwhEWm1RgNd7dxD/o+nnLW8oH+6RK1OGnmbmkj/GGoDPV1WWMVP0FXYQBivKHdwM1pwii3bt//RC62EriIUQ==}
@@ -6561,6 +6582,10 @@ packages:
     resolution: {integrity: sha512-DEAoo25RfSYMuTGc9vPJzZcZullwIqRDSI9LOy+fkCJPi6hykCnfKaXTuPBDuXAUcqHXyOgFtHNp/kB2FjYHbw==}
     dev: false
 
+  /webextension-polyfill/0.10.0:
+    resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
+    dev: false
+
   /webidl-conversions/4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
     dev: false
@@ -6672,4 +6697,8 @@ packages:
       archiver-utils: 2.1.0
       compress-commons: 4.1.1
       readable-stream: 3.6.0
+    dev: false
+
+  /zod/3.20.6:
+    resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
     dev: false

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Label } from '~components/ui/Label'
 import { Textarea } from '~components/ui/Textarea'
+import { PLUGIN_TOGGLE_MSG } from '~lib/constants'
 
 import cssText from 'data-text:~tailwind.css'
 
@@ -15,12 +16,19 @@ const PlasmoOverlay = () => {
   const [val, setVal] = useState('')
   const [show, setShow] = useState(true)
 
+  useEffect(() => {
+    const recvMsg = (msg: unknown) => {
+      if (msg === PLUGIN_TOGGLE_MSG) setShow((s) => !s)
+    }
+
+    chrome.runtime.onMessage.addListener(recvMsg)
+    return () => chrome.runtime.onMessage.removeListener(recvMsg)
+  }, [])
+
   return (
     <div className="fixed top-4 right-4 rounded-md bg-black/50 p-1 font-sans text-gray-900 shadow backdrop-blur-lg">
-      {show ? (
+      {show && (
         <div className="h-[420px] w-[380px] overflow-y-auto overflow-x-clip rounded-md  bg-white p-3">
-          <button onClick={() => setShow(false)}>Hide Farseer</button>
-
           <div className="mt-5 grid w-full gap-1.5">
             <Label htmlFor="columnNames">Column Names</Label>
             <Textarea
@@ -31,8 +39,6 @@ const PlasmoOverlay = () => {
             />
           </div>
         </div>
-      ) : (
-        <button onClick={() => setShow(true)}>Open Farseer</button>
       )}
     </div>
   )
