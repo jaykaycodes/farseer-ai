@@ -8,13 +8,19 @@
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
-    "package": "plasmo package"
+    "package": "plasmo package",
+    "invoke": "node -r esbuild-runner/register --"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "@plasmohq/messaging": "^0.1.1",
     "@radix-ui/react-label": "^2.0.0",
     "class-variance-authority": "^0.4.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.115.0",
+    "node-html-parser": "^6.1.4",
     "plasmo": "0.65.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -31,6 +37,8 @@
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",
     "autoprefixer": "^10.4.13",
+    "esbuild": "^0.17.8",
+    "esbuild-runner": "^2.2.2",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
