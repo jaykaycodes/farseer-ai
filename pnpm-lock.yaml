@@ -26,6 +26,7 @@ specifiers:
   lodash: ^4.17.21
   lucide-react: ^0.115.0
   node-html-parser: ^6.1.4
+  openai-fetch: ^1.0.3
   plasmo: 0.65.0
   postcss: ^8.4.21
   prettier: 2.8.3
@@ -45,6 +46,7 @@ dependencies:
   lodash: 4.17.21
   lucide-react: 0.115.0_react@18.2.0
   node-html-parser: 6.1.4
+  openai-fetch: 1.0.3
   plasmo: 0.65.0_caz4rp5f2m5b5pfnyfvfyyugpi
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -5013,6 +5015,11 @@ packages:
       json-buffer: 3.0.1
     dev: false
 
+  /ky/0.33.2:
+    resolution: {integrity: sha512-f6oS2rKUcPu5FzdqCDbFpmzis/JlqFZw8uIHm/jf8Kc3vtnW+VDhuashOAKyBZv8bFiZFZUMNxTC0JtahEvujA==}
+    engines: {node: '>=14.16'}
+    dev: false
+
   /language-subtag-registry/0.3.22:
     resolution: {integrity: sha512-tN0MCzyWnoz/4nHS6uxdlFWoUZT7ABptwKPQ52Ea7URk6vll88bWBVhodtnlfEuCcKWNGoc+uGbw1cwa9IKh/w==}
     dev: true
@@ -5586,6 +5593,13 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       mimic-fn: 2.1.0
+    dev: false
+
+  /openai-fetch/1.0.3:
+    resolution: {integrity: sha512-InNc/7TwHv3ihHOfyDTGe5W6U/cfZoF48AUsEpX2cRgR67k3C4PZXv7ssA5M2o8RPNR84BJU7zvsXpsfEP+bLQ==}
+    dependencies:
+      ky: 0.33.2
+      zod: 3.20.6
     dev: false
 
   /optionator/0.9.1:
