@@ -4,6 +4,7 @@ import path from 'path'
 import { HTMLElement, NodeType, parse } from 'node-html-parser'
 
 // https://platform.openai.com/playground/p/Z8oqEmAXGhdlDzk6ywQmbZSl?model=text-davinci-003
+// https://platform.openai.com/tokenizer
 async function main() {
   const schemaPath = path.join(process.cwd(), 'assets/example.html')
   const htmlPage = readFileSync(schemaPath, 'utf8')
