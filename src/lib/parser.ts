@@ -4,7 +4,7 @@ import path from 'path'
 import { HTMLElement, Node, NodeType, parse } from 'node-html-parser'
 
 async function main() {
-  const schemaPath = path.join(process.cwd(), 'packages/parser/example.html')
+  const schemaPath = path.join(process.cwd(), 'assets/example.html')
   const htmlPage = readFileSync(schemaPath, 'utf8')
   const parsed = parse(htmlPage)
 

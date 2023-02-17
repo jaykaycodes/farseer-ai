@@ -11,9 +11,6 @@
     "package": "plasmo package",
     "invoke": "node -r esbuild-runner/register --"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "dependencies": {
     "@plasmohq/messaging": "^0.1.1",
     "@radix-ui/react-label": "^2.0.0",
