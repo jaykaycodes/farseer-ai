@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
 export const SubmitRequestSchema = z.object({
-  questions: z
+  outFields: z
     .array(
       z.object({
         name: z.string().min(1),
-        question: z.string().min(5),
+        hint: z.string().min(5),
       }),
     )
     .min(1),

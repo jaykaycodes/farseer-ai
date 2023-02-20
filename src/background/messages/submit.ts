@@ -13,13 +13,25 @@ const handler: PlasmoMessaging.MessageHandler<ISubmitRequest, ISubmitResponse> =
     return
   }
 
-  let prompt = `Given the following: """${req.body.content}"""\nAnswer these questions. Format your response in JSON.\n`
-  for (const q of req.body.questions) {
-    prompt += `- ${q.name}: ${q.question} (string)\n`
-  }
+  let prompt = `Given this text:`
+  prompt += `"""\n${req.body.content}\n"""\n`
+  prompt += 'Generate JSON with this structure:\n'
+  prompt += JSON.stringify(req.body.outFields)
+  // prompt += `{\n`
+  // req.body.outFields.forEach((field, index) => {
+  //   prompt += `  // ${field.hint}\n`
+  //   prompt += `  "${field.name}":"${field.example}"`
+  //   if (index < req.body.outFields.length - 1) prompt += ','
+  //   prompt += '\n'
+  // })
+  // prompt += `}\n`
+
+  const outputPrefix = `
+{"${req.body.outFields[0].name}":"`
+  prompt += outputPrefix
 
   const response = await openai.createCompletion({
-    model: 'text-curie-001',
+    model: 'text-davinci-003',
     prompt,
     temperature: 0,
     max_tokens: 820,
@@ -28,7 +40,7 @@ const handler: PlasmoMessaging.MessageHandler<ISubmitRequest, ISubmitResponse> =
     presence_penalty: 0,
   })
 
-  const output = response.completion
+  const output = `${outputPrefix}${response.completion}`
 
   res.send({
     prompt,

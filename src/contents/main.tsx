@@ -19,11 +19,17 @@ export const getStyle = () => {
 const PlasmoOverlay = () => {
   const { control, register, handleSubmit, formState } = useForm({
     resolver: zodResolver(SubmitRequestSchema),
-    defaultValues: { content: '', questions: [{ name: '', question: '' }] },
+    defaultValues: {
+      content: '',
+      outFields: [
+        { name: 'latest_post', hint: 'title of the most recent post' },
+        { name: 'most_upvoted', hint: 'title of the most upvoted post' },
+      ],
+    },
   })
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'questions',
+    name: 'outFields',
     rules: { minLength: 1 },
   })
 
@@ -56,11 +62,11 @@ const PlasmoOverlay = () => {
   }
 
   const onAddField = () => {
-    append({ name: '', question: '' })
+    append({ name: '', hint: '' })
   }
   useLayoutEffect(() => {
     // When a field is added/removed, focus on the name input
-    const lastField = document.getElementById(`questions[${fields.length - 1}].name`)
+    const lastField = document.getElementById(`outFields[${fields.length - 1}].name`)
     if (lastField) {
       lastField.focus()
       lastField.parentElement.scrollIntoView(true)
@@ -75,19 +81,19 @@ const PlasmoOverlay = () => {
             <li key={field.id}>
               <div className="border-base-200 focus-within:border-primary input-gr group flex flex-col rounded-lg border transition-colors">
                 <input
-                  id={`questions[${index}].name`}
+                  id={`outFields[${index}].name`}
                   type="text"
                   placeholder="field_name"
                   className="input input-ghost input-xs border-base-200 w-full rounded-b-none border-b text-sm font-bold focus:outline-none"
                   autoComplete="off"
-                  {...register(`questions.${index}.name`)}
+                  {...register(`outFields.${index}.name` as const)}
                 />
 
                 <textarea
-                  id={`prompts[${index}].prompt`}
-                  placeholder="Enter a question"
-                  className="textarea textarea-xs my-1 resize-none text-sm focus:outline-none"
-                  {...register(`questions.${index}.question`)}
+                  id={`prompts[${index}].hint`}
+                  placeholder="What should this field contain?"
+                  className="textarea textarea-ghost textarea-xs my-1 resize-none text-sm focus:outline-none"
+                  {...register(`outFields.${index}.hint` as const)}
                 />
 
                 {index > 0 && (
@@ -101,11 +107,11 @@ const PlasmoOverlay = () => {
                   </button>
                 )}
               </div>
-              {formState.errors.questions?.[index]?.name && (
-                <p className="text-error text-xs">{formState.errors.questions[index].name.message}</p>
+              {formState.errors.outFields?.[index]?.name && (
+                <p className="text-error text-xs">{formState.errors.outFields[index].name.message}</p>
               )}
-              {formState.errors.questions?.[index]?.question && (
-                <p className="text-error text-xs">{formState.errors.questions[index].question.message}</p>
+              {formState.errors.outFields?.[index]?.hint && (
+                <p className="text-error text-xs">{formState.errors.outFields[index].hint.message}</p>
               )}
             </li>
           ))}
@@ -131,7 +137,7 @@ const PlasmoOverlay = () => {
         <div className="mt-5">
           <h3>Output</h3>
           <div className="h-36 w-full overflow-y-auto rounded-lg border border-dashed border-gray-400 p-2">
-            <pre>{output}</pre>
+            <pre>{JSON.stringify(JSON.parse(output), null, 2)}</pre>
           </div>
         </div>
       )}
