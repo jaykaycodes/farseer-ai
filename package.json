@@ -12,10 +12,9 @@
     "invoke": "node -r esbuild-runner/register --"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.9.11",
     "@plasmohq/messaging": "^0.1.1",
-    "@radix-ui/react-label": "^2.0.0",
-    "class-variance-authority": "^0.4.0",
-    "lodash": "^4.17.21",
+    "daisyui": "^2.50.2",
     "lucide-react": "^0.115.0",
     "node-html-parser": "^6.1.4",
     "openai-fetch": "^1.0.3",
@@ -24,7 +23,6 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.1",
     "tailwind-merge": "^1.9.1",
-    "tailwindcss-animate": "^1.0.5",
     "zod": "^3.20.6"
   },
   "devDependencies": {
