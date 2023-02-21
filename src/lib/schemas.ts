@@ -1,14 +1,24 @@
 import { z } from 'zod'
 
+export const OutputFieldSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  hint: z.string().min(5),
+})
+export type IOutputField = z.infer<typeof OutputFieldSchema>
+
+export const ProjectFieldsSchema = z.array(OutputFieldSchema).min(1)
+export type IProjectFields = z.infer<typeof ProjectFieldsSchema>
+
+export const ProjectSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  fields: ProjectFieldsSchema,
+})
+export type IProject = z.infer<typeof ProjectSchema>
+
 export const SubmitRequestSchema = z.object({
-  outFields: z
-    .array(
-      z.object({
-        name: z.string().min(1),
-        hint: z.string().min(5),
-      }),
-    )
-    .min(1),
+  outputFields: z.array(OutputFieldSchema.required()),
   content: z.string(),
 })
 export type ISubmitRequest = z.infer<typeof SubmitRequestSchema>
