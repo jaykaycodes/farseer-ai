@@ -1,6 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
 
+import { html2GPTStr } from '~lib/parser'
 import type { ISubmitRequest, ISubmitResponse } from '~lib/schemas'
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
@@ -13,8 +14,10 @@ const handler: PlasmoMessaging.MessageHandler<ISubmitRequest, ISubmitResponse> =
     return
   }
 
-  let prompt = `Given this text:`
-  prompt += `"""\n${req.body.content}\n"""\n`
+  const gptStr = html2GPTStr(req.body.content)
+
+  let prompt = `Given this html:`
+  prompt += `"""\n${gptStr}\n"""\n`
   prompt += 'Generate JSON with this structure:\n'
   prompt += JSON.stringify(req.body.outFields)
   // prompt += `{\n`

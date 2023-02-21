@@ -10,6 +10,43 @@ import { tw } from '~lib/utils'
 
 import cssText from 'data-text:~tailwind.css'
 
+function document2HTMLString(document: Document): string {
+  let content = ''
+
+  const headHTMLCollection = document.getElementsByTagName('head')
+  if (headHTMLCollection.length > 0) {
+    content += headHTMLCollection.item(0).outerHTML
+  }
+
+  const mainHTMLCollection = document.getElementsByTagName('main')
+  if (mainHTMLCollection.length > 0) {
+    let idx = 0
+    while (mainHTMLCollection.item(idx) !== null) {
+      content += mainHTMLCollection.item(idx).outerHTML
+      idx++
+    }
+    return content
+  }
+
+  const contentHTMLCollection = document.getElementsByClassName('content')
+  if (contentHTMLCollection.length > 0) {
+    let idx = 0
+    while (contentHTMLCollection.item(idx) !== null) {
+      content += contentHTMLCollection.item(idx).outerHTML
+      idx++
+    }
+    return content
+  }
+
+  const bodyHTMLCollection = document.getElementsByTagName('body')
+  if (bodyHTMLCollection.length > 0) {
+    content += bodyHTMLCollection.item(0).outerHTML
+    return content
+  }
+
+  return content
+}
+
 export const getStyle = () => {
   const style = document.createElement('style')
   style.textContent = cssText
@@ -36,12 +73,7 @@ const PlasmoOverlay = () => {
   const [output, setOutput] = useState<string | null>(null)
 
   const onSubmit: SubmitHandler<ISubmitRequest> = async (body) => {
-    let content = ''
-    document.querySelectorAll('span.titleline,span.subline').forEach((el) => {
-      content += el.textContent.trim() + '\n'
-    })
-    content.slice(0, 4000)
-    body.content = content
+    body.content = document2HTMLString(document)
 
     const _res = await sendToBackground<ISubmitRequest, ISubmitResponse>({
       name: 'submit',
