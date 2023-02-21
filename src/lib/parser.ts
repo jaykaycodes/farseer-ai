@@ -15,7 +15,9 @@ export function html2GPTStr(htmlString: string): string {
     element.childNodes.forEach((child, idx) => {
       if (child.nodeType === NodeType.TEXT_NODE && child.text.trim() !== '') {
         const parent = child.parentNode
-        if (!['SCRIPT', 'BODY', 'HTML', 'STYLE', 'NOSCRIPT', 'LINK', 'NAV', 'FOOTER'].includes(parent.tagName)) {
+        if (
+          !['SCRIPT', 'BODY', 'HTML', 'STYLE', 'NOSCRIPT', 'LINK', 'NAV', 'FOOTER', 'ASIDE'].includes(parent.tagName)
+        ) {
           const childContent = child.textContent.trim()
           if (/[a-zA-Z0-9]/gi.test(childContent)) {
             GPTStr += `\n<${parent.tagName}> ${childContent}`
@@ -43,9 +45,9 @@ export function html2GPTStr(htmlString: string): string {
           }
           // don't parse children if they are in a nav or footer or menu
         } else if (
+          ['NAV', 'FOOTER', 'ASIDE'].includes(childEle.tagName) ||
           /nav|footer|menu/gi.test(childEle.attrs['class'] || '') ||
-          /nav|footer|menu/gi.test(childEle.attrs['id'] || '') ||
-          ['NAV', 'FOOTER'].includes(childEle.tagName)
+          /nav|footer|menu/gi.test(childEle.attrs['id'] || '')
         ) {
           return
         } else {
@@ -57,5 +59,5 @@ export function html2GPTStr(htmlString: string): string {
 
   traverse(rootElement, 0)
 
-  return GPTStr.slice(0, 5000).trim()
+  return GPTStr.slice(0, 6000).trim()
 }

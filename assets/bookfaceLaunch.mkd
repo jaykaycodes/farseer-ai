@@ -1,0 +1,39 @@
+# 🎇🪄 Launch Bookface: Farseer.ai - Get csv/json/xlsx from unstructured webpages.
+
+Hey YC fam! 
+
+We built Farseer to let you **ask questions to get structured JSON data from unstructured webpages**. 
+### 💍 Example
+Whilst on Linkedin you stumble on a potential lead to email later. In Farseer.ai, you have a _"new lead"_ question template.  
+
+	- What is this persons full name?
+	- Can you list all the companies where this person worked?
+	- Where did this person go to school?
+	- Do we know any of the same people?
+
+Running Farseer takes the questions and page content and puts it through a LLM the output is a format, like
+```JSON
+{
+	full_name: "Justin Hilliard",
+	companies: "He was a Data Scientist at Sonos and a part of the Product Growth team at Facebook",
+	education: "Carnegie Mellon.  Majoring in Computer Science",
+	mutual_connects: "4 mutual connections."
+}
+```
+
+### 🫠 Usecases
+- **Affiliate Marketers** - Take product webpages from multiple sources, summarize it and store it in a DB to display on an affiliate site.
+- **Lead Generation** - Take LinkedIn profiles, ask common questions about the profiles, send that data to CRM or airtable.
+- **Recruiting** - Take LinkedIn profiles, ask common questions about the profiles, send that data to an ATS or airtable.
+- **Competition Cataloging** - Take competitors marketing pages, ask questions about the companies value props, send to notion.
+
+### ⚙️ How it works
+- 🛠️ Built as a Browser extension compatible with most modern browsers (chrome, safari, firefox).
+- 📝 Save multiple `question templates`.  These are sets of related questions to run on multiple webpages.
+- 🏃‍♂️ Run for any site.
+- 👩‍💻 Process results with a __javascript code__.
+
+👇👇👇👇👇👇
+**Interested? Let's chat book here**
+❓🕐 https://cal.com/justin-hilliard-gga8cj/30min❓🕐
+👆👆👆👆👆👆

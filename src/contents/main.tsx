@@ -96,6 +96,7 @@ const PlasmoOverlay = () => {
   const onAddField = () => {
     append({ name: '', hint: '' })
   }
+
   useLayoutEffect(() => {
     // When a field is added/removed, focus on the name input
     const lastField = document.getElementById(`outFields[${fields.length - 1}].name`)
@@ -116,10 +117,12 @@ const PlasmoOverlay = () => {
                   id={`outFields[${index}].name`}
                   type="text"
                   placeholder="field_name"
-                  className="input input-ghost input-xs border-base-200 w-full rounded-b-none border-b text-sm font-bold focus:outline-none"
+                  className="input input-ghost input-xs  w-full text-sm font-bold focus:outline-none"
                   autoComplete="off"
                   {...register(`outFields.${index}.name` as const)}
                 />
+
+                <div className="bg-base-200 h-[1px]" />
 
                 <textarea
                   id={`prompts[${index}].hint`}
@@ -131,7 +134,7 @@ const PlasmoOverlay = () => {
                 {index > 0 && (
                   <button
                     type="button"
-                    className="btn btn-xs text-error btn-link btn-square ml-auto gap-x-1 focus:outline-offset-0"
+                    className="btn btn-xs text-error btn-link btn-square m-1 ml-auto focus:outline-offset-0"
                     onClick={() => remove(index)}
                   >
                     <Trash2Icon size="16" />

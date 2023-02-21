@@ -19,14 +19,42 @@ const MainLayout = ({ children }: Props) => {
     return () => chrome.runtime.onMessage.removeListener(recvMsg)
   }, [])
 
+  const [isDragging, setIsDragging] = useState(false)
+  const [xTranslate, setXTranslate] = useState(0)
+  const [yTranslate, setYTranslate] = useState(0)
+  const [initialMousePosition, setInitialMousePosition] = useState({ x: null, y: null })
+  const onMouseDown = ({ clientX, clientY }) => {
+    setInitialMousePosition({ x: clientX, y: clientY })
+    setIsDragging(true)
+  }
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      setXTranslate(xTranslate + e.clientX - initialMousePosition.x)
+      setYTranslate(yTranslate + e.clientY - initialMousePosition.y)
+    }
+    if (isDragging) {
+      window.addEventListener('mousemove', onMouseMove)
+    }
+    return () => window.removeEventListener('mousemove', onMouseMove)
+  }, [isDragging, initialMousePosition])
+  useEffect(() => {
+    const onMouseUp = () => setIsDragging(false)
+    window.addEventListener('mouseup', onMouseUp)
+    return () => window.removeEventListener('mouseup', onMouseUp)
+  }, [])
+
   return (
     <div
       data-theme="emerald"
-      className="fixed top-4 right-4 rounded-md bg-black/50 p-1 font-sans text-gray-900 shadow backdrop-blur-lg"
+      className="fixed top-4 right-4 rounded-md bg-black/50 p-1 font-sans text-gray-900 shadow"
+      style={{ transform: `translate(${xTranslate}px,${yTranslate}px)` }}
     >
       {show && (
-        <div className="bg-base-100 max-h-[420px] w-[380px] overflow-y-auto overflow-x-clip rounded-md">
-          <div className="flex h-10 items-center border-b border-gray-300 p-2">
+        <div
+          style={{ resize: 'vertical' }}
+          className="bg-base-100 max-h-[600px] w-[380px] overflow-y-auto overflow-x-clip rounded-md"
+        >
+          <div className="flex h-10 cursor-move items-center border-b border-gray-300 p-2" onMouseDown={onMouseDown}>
             <div className="inline-flex w-1/2 items-center justify-start">
               <h1>🔮 Farseer</h1>
             </div>

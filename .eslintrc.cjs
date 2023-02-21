@@ -43,6 +43,7 @@ module.exports = {
     'no-labels': 'off',
     'vars-on-top': 'off',
     'no-unused-labels': 'off',
+    'jsx-a11y/no-static-element-interactions': 'off',
     'unused-imports/no-unused-imports': 'warn',
     'unused-imports/no-unused-vars': [
       'warn',
