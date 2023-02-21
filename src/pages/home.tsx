@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { createId } from '@paralleldrive/cuid2'
+import { sendToBackground } from '@plasmohq/messaging'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate } from 'react-router-dom'
 
 import { useCreateProjectFieldMutation, useDeleteProjectFieldMutation, useSubmitRequestMutation } from '~lib/mutations'
 import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
-import type { IOutputField } from '~lib/schemas'
+import type { IOutletRequest, IOutletResponse, IOutputField } from '~lib/schemas'
 import { doc2HTMLString, tw } from '~lib/utils'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
@@ -43,6 +45,36 @@ const HomePage = () => {
 
   const handleDeleteField = async (fieldId: string) => {
     deleteField({ projectId: DEFAULT_PROJECT_ID, fieldId })
+  }
+
+  const [sendingToOutlet, setSendingToOutlet] = useState(false)
+
+  const sendToOutlet = async () => {
+    setSendingToOutlet(true)
+    const outlet = 'airtable'
+    const pageURL = new URL(window.location.href)
+    const url = pageURL.href
+
+    const res = await sendToBackground<IOutletRequest, IOutletResponse>({
+      name: 'sendToOutlet',
+      body: {
+        outlet,
+        url,
+        output: JSON.parse(output!),
+      },
+    })
+
+    setSendingToOutlet(false)
+
+    if ('error' in res) {
+      console.error(res.error)
+      return
+    } else if ('ok' in res) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Did the record get sent successfully? ')
+        console.log(res.ok)
+      }
+    }
   }
 
   return (
@@ -85,6 +117,15 @@ const HomePage = () => {
           <h3>Output</h3>
           <div className="h-36 w-full overflow-y-auto rounded-lg border border-dashed border-gray-400 p-2">
             <pre>{JSON.stringify(JSON.parse(output), null, 2)}</pre>
+          </div>
+          <div className="mt-2 flex justify-end">
+            <button
+              disabled={sendingToOutlet}
+              onClick={async () => await sendToOutlet()}
+              className={tw('btn btn-sm', sendingToOutlet && 'loading')}
+            >
+              To Airtable
+            </button>
           </div>
         </div>
       )}
