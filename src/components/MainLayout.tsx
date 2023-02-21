@@ -55,9 +55,12 @@ const MainLayout = ({ handleClose, children }: Props) => {
               </Button> */}
           </div>
 
-          <div className="inline-flex w-1/2 items-center justify-end">
-            <button className="btn btn-ghost btn-square btn-xs focus:outline-offset-0" onClick={handleClose}>
-              <XIcon size={20} />
+          <div className="inline-flex w-1/2 justify-end">
+            <button
+              className="btn btn-ghost btn-square btn-xs flex items-center focus:outline-offset-0"
+              onClick={handleClose}
+            >
+              <XIcon size={18} />
             </button>
           </div>
         </div>

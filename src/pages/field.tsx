@@ -38,12 +38,12 @@ const FieldPage = () => {
   return (
     <>
       <div className="flex items-center justify-between">
-        <Link to=".." className="inline-flex gap-x-1">
-          <ChevronLeftIcon /> Back
+        <Link to=".." className="inline-flex items-center gap-x-1">
+          <ChevronLeftIcon size={14} /> Back
         </Link>
 
-        <button type="button" className="text-error inline-flex text-sm" onClick={handleDeleteField}>
-          <Trash2Icon size="16" /> Delete
+        <button type="button" className="text-error inline-flex items-center" onClick={handleDeleteField}>
+          <Trash2Icon size={14} />
         </button>
       </div>
 
