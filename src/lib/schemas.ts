@@ -33,3 +33,21 @@ export const SubmitResponseSchema = z.union([
   }),
 ])
 export type ISubmitResponse = z.infer<typeof SubmitResponseSchema>
+
+export const OutletRequestSchema = z.object({
+  output: z.object({}).passthrough(),
+  url: z.string(),
+  outlet: z.enum(['airtable']),
+})
+
+export type IOutletRequest = z.infer<typeof OutletRequestSchema>
+
+export const OutletResponseSchema = z.union([
+  z.object({
+    error: z.string(),
+  }),
+  z.object({
+    ok: z.boolean(),
+  }),
+])
+export type IOutletResponse = z.infer<typeof OutletResponseSchema>

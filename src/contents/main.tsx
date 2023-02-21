@@ -30,7 +30,7 @@ export const getStyle = () => {
 }
 
 const PlasmoOverlay = () => {
-  const [show, setShow] = useState(true)
+  const [show, setShow] = useState(process.env.NODE_ENV === 'development')
 
   useEffect(() => {
     const recvMsg = (msg: unknown) => {
