@@ -38,7 +38,6 @@ export function html2GPTStr(htmlString: string): string {
           childEle.tagName === 'META' &&
           (Object.hasOwn(childEle.attrs, 'name') || Object.hasOwn(childEle.attrs, 'property'))
         ) {
-          console.log(childEle.tagName)
           if (/title|description/gi.test(childEle.attrs.name) || /title|description/gi.test(childEle.attrs.property)) {
             GPTStr += `\n<META> ${childEle.attrs.content}`
           }
