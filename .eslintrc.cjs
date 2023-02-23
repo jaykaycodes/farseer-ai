@@ -113,6 +113,7 @@ module.exports = {
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-extra-semi': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
       },
     },
