@@ -6,14 +6,30 @@ export const OutputFieldSchema = z.object({
   hint: z.string().min(5),
 })
 export type IOutputField = z.infer<typeof OutputFieldSchema>
-
 export const ProjectFieldsSchema = z.array(OutputFieldSchema).min(1)
 export type IProjectFields = z.infer<typeof ProjectFieldsSchema>
+
+export const OutletSchema = z.discriminatedUnion('outlet', [
+  z.object({
+    id: z.string(),
+    outlet: z.literal('airtable'),
+    baseId: z.string(),
+    tableId: z.string(),
+  }),
+  z.object({
+    id: z.string(),
+    outlet: z.literal('csv'),
+  }),
+])
+export type IOutlet = z.infer<typeof OutletSchema>
+export const ProjectOutletsSchema = z.array(OutletSchema).min(1)
+export type IProjectOutlets = z.infer<typeof ProjectOutletsSchema>
 
 export const ProjectSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   fields: ProjectFieldsSchema,
+  outlets: ProjectOutletsSchema,
 })
 export type IProject = z.infer<typeof ProjectSchema>
 
@@ -37,7 +53,7 @@ export type ISubmitResponse = z.infer<typeof SubmitResponseSchema>
 export const OutletRequestSchema = z.object({
   output: z.object({}).passthrough(),
   url: z.string(),
-  outlet: z.enum(['airtable']),
+  outlet: OutletSchema,
 })
 
 export type IOutletRequest = z.infer<typeof OutletRequestSchema>

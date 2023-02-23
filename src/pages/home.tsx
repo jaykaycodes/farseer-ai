@@ -1,13 +1,16 @@
-import { useState } from 'react'
 import { createId } from '@paralleldrive/cuid2'
-import { sendToBackground } from '@plasmohq/messaging'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate } from 'react-router-dom'
 
-import { useCreateProjectFieldMutation, useDeleteProjectFieldMutation, useSubmitRequestMutation } from '~lib/mutations'
+import {
+  useCreateOutletMutation,
+  useCreateProjectFieldMutation,
+  useDeleteProjectFieldMutation,
+  useSubmitRequestMutation,
+} from '~lib/mutations'
 import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
-import type { IOutletRequest, IOutletResponse, IOutputField } from '~lib/schemas'
+import type { IOutlet, IOutputField } from '~lib/schemas'
 import { doc2HTMLString, tw } from '~lib/utils'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
@@ -17,6 +20,7 @@ const HomePage = () => {
   const { data: project } = useQuery(projectQuery)
   const { mutateAsync: submitRequest, isLoading: isSubmitting, data: output } = useSubmitRequestMutation()
   const { mutateAsync: createField, isLoading: isCreatingField } = useCreateProjectFieldMutation()
+  const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
 
   const handleSubmit = async () => {
@@ -47,48 +51,64 @@ const HomePage = () => {
     deleteField({ projectId: DEFAULT_PROJECT_ID, fieldId })
   }
 
-  const [sendingToOutlet, setSendingToOutlet] = useState(false)
-
-  const sendToOutlet = async () => {
-    setSendingToOutlet(true)
-    const outlet = 'airtable'
-    const pageURL = new URL(window.location.href)
-    const url = pageURL.href
-
-    const res = await sendToBackground<IOutletRequest, IOutletResponse>({
-      name: 'sendToOutlet',
-      body: {
-        outlet,
-        url,
-        output: JSON.parse(output!),
+  const handleAddOutlet = async () => {
+    const id = createId()
+    await createOutlet({
+      projectId: DEFAULT_PROJECT_ID,
+      outlet: {
+        id,
+        outlet: 'airtable',
+        baseId: 'app123',
+        tableId: 'table123',
       },
     })
-
-    setSendingToOutlet(false)
-
-    if ('error' in res) {
-      console.error(res.error)
-      return
-    } else if ('ok' in res) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Did the record get sent successfully? ')
-        console.log(res.ok)
-      }
-    }
+    navigate(`/outlet/${id}`)
   }
+
+  // const [sendingToOutlet, setSendingToOutlet] = useState(false)
+
+  // const sendToOutlet = async () => {
+  //   setSendingToOutlet(true)
+  //   const outlet = 'airtable'
+  //   const pageURL = new URL(window.location.href)
+  //   const url = pageURL.href
+
+  //   const res = await sendToBackground<IOutletRequest, IOutletResponse>({
+  //     name: 'sendToOutlet',
+  //     body: {
+  //       outlet,
+  //       url,
+  //       output: JSON.parse(output!),
+  //     },
+  //   })
+
+  //   setSendingToOutlet(false)
+
+  //   if ('error' in res) {
+  //     console.error(res.error)
+  //     return
+  //   } else if ('ok' in res) {
+  //     if (process.env.NODE_ENV === 'development') {
+  //       console.log('Did the record get sent successfully? ')
+  //       console.log(res.ok)
+  //     }
+  //   }
+  // }
 
   return (
     <div>
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">Fields</h2>
-        <button
-          disabled={isCreatingField}
-          type="button"
-          className={tw('btn btn-xs btn-link inline-flex items-center', isCreatingField && 'loading')}
-          onClick={handleAddField}
-        >
-          + Add Field
-        </button>
+        <div>
+          <button
+            disabled={isCreatingField}
+            type="button"
+            className={tw('btn btn-xs btn-link', isCreatingField && 'loading')}
+            onClick={handleAddField}
+          >
+            + Add Field
+          </button>
+        </div>
       </div>
 
       <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
@@ -118,13 +138,36 @@ const HomePage = () => {
           <div className="h-36 w-full overflow-y-auto rounded-lg border border-dashed border-gray-400 p-2">
             <pre>{JSON.stringify(JSON.parse(output), null, 2)}</pre>
           </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold">Exports</h2>
+            <div>
+              <button
+                disabled={isCreatingOutlet}
+                type="button"
+                className={tw('btn btn-xs btn-link', isCreatingOutlet && 'loading')}
+                onClick={handleAddOutlet}
+              >
+                + Add Export
+              </button>
+            </div>
+          </div>
+
+          <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
+            {project?.outlets.map((outlet) => (
+              <OutletListItem
+                key={outlet.id}
+                outlet={outlet}
+                // onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
+              />
+            ))}
+          </ul>
           <div className="mt-2 flex justify-end">
             <button
-              disabled={sendingToOutlet}
-              onClick={async () => await sendToOutlet()}
-              className={tw('btn btn-sm', sendingToOutlet && 'loading')}
+            // disabled={sendingToOutlet}
+            // onClick={async () => await sendToOutlet()}
+            // className={tw('btn btn-sm', sendingToOutlet && 'loading')}
             >
-              To Airtable
+              Export
             </button>
           </div>
         </div>
@@ -170,6 +213,24 @@ const FieldListItem = ({ field }: FieldListItemProps) => (
       <div>
         <h3 className="text-sm font-semibold">{field.name}</h3>
         <p className="text-xs text-gray-700">{field.hint}</p>
+      </div>
+
+      <div className="flex items-center gap-x-1">
+        <ChevronRightIcon size={20} className="text-base-300 scale-y-150" />
+      </div>
+    </Link>
+  </li>
+)
+
+interface OutletListItemProps {
+  outlet: IOutlet
+}
+
+const OutletListItem = ({ outlet }: OutletListItemProps) => (
+  <li className="hover:bg-base-200">
+    <Link to={`/outlet/${outlet.id}`} className="flex justify-between p-2">
+      <div>
+        <h3 className="text-sm font-semibold">{outlet.outlet}</h3>
       </div>
 
       <div className="flex items-center gap-x-1">

@@ -25,10 +25,6 @@ const FieldPage = () => {
     mode: 'onBlur',
   })
 
-  const onSubmit = (field: IOutputField) => {
-    mutate({ projectId, field })
-  }
-
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
   const handleDeleteField = async () => {
     await deleteField({ projectId: DEFAULT_PROJECT_ID, fieldId })
@@ -47,9 +43,12 @@ const FieldPage = () => {
         </button>
       </div>
 
-      {/* <h2 className="font-bold">{data?.name}</h2> */}
-
-      <form onBlur={handleSubmit(onSubmit)} className={tw('mt-3 space-y-2', formState.isSubmitting && 'disabled')}>
+      <form
+        onBlur={handleSubmit((field: IOutputField) => {
+          mutate({ projectId, field })
+        })}
+        className={tw('mt-3 space-y-2', formState.isSubmitting && 'disabled')}
+      >
         <TextField
           label="Field name"
           error={formState.errors.name?.message}

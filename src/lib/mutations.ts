@@ -2,8 +2,12 @@ import { sendToBackground } from '@plasmohq/messaging'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { getProject, getProjects, Q } from './queries'
-import { IOutputField, IProject, ISubmitRequest, ISubmitResponse, SubmitResponseSchema } from './schemas'
+import { IOutlet, IOutputField, IProject, ISubmitRequest, ISubmitResponse, SubmitResponseSchema } from './schemas'
 import { storage } from './storage'
+
+/**
+ * Project Mutations
+ */
 
 async function createProject(project: IProject): Promise<IProject> {
   const projects = await getProjects()
@@ -42,6 +46,10 @@ export const useUpdateProjectMutation = () => {
     },
   })
 }
+
+/**
+ * Field Mutations
+ */
 
 const createProjectField = async ({ projectId, field }: { projectId: string; field: IOutputField }) => {
   const project = await getProject(projectId)
@@ -96,6 +104,67 @@ export const useUpdateProjectFieldMutation = () => {
   return useMutation(updateProjectField, {
     onSuccess: (field, { projectId }) => {
       queryClient.setQueryData(Q.project.detail(projectId)._ctx.field(field.id).queryKey, field)
+      queryClient.invalidateQueries(Q.project.detail(projectId).queryKey)
+    },
+  })
+}
+
+/**
+ * Outlet Mutations
+ */
+
+const createOutlet = async ({ projectId, outlet }: { projectId: string; outlet: IOutlet }) => {
+  const project = await getProject(projectId)
+  project.outlets.push(outlet)
+  await updateProject(project)
+  return outlet
+}
+
+export const useCreateOutletMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(createOutlet, {
+    onSuccess: (outlet, { projectId }) => {
+      queryClient.setQueryData(Q.project.detail(projectId)._ctx.field(outlet.id).queryKey, outlet)
+      queryClient.invalidateQueries(Q.project.detail(projectId).queryKey)
+    },
+  })
+}
+const updateOutlet = async ({ projectId, outlet }: { projectId: string; outlet: IOutlet }) => {
+  const project = await getProject(projectId)
+  const index = project.outlets.findIndex((f) => f.id === outlet.id)
+  if (index === -1) throw new Error(`Outlet ${outlet.id} not found`)
+  project.outlets[index] = outlet
+  await updateProject(project)
+  return outlet
+}
+
+export const useUpdateOutletMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(updateOutlet, {
+    onSuccess: (outlet, { projectId }) => {
+      queryClient.invalidateQueries(Q.project.detail(projectId)._ctx.outlet(outlet.id).queryKey)
+      queryClient.invalidateQueries(Q.project.detail(projectId).queryKey)
+    },
+  })
+}
+
+const deleteOutlet = async ({ projectId, outletId }: { projectId: string; outletId: string }) => {
+  const project = await getProject(projectId)
+  const index = project.outlets.findIndex((o) => o.id === outletId)
+  if (index === -1) throw new Error(`Field ${outletId} not found`)
+  project.outlets.splice(index, 1)
+  await updateProject(project)
+  return outletId
+}
+
+export const useDeleteOutletMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(deleteOutlet, {
+    onSuccess: (outletId, { projectId }) => {
+      queryClient.invalidateQueries(Q.project.detail(projectId)._ctx.outlet(outletId).queryKey)
       queryClient.invalidateQueries(Q.project.detail(projectId).queryKey)
     },
   })

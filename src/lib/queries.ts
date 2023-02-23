@@ -2,7 +2,7 @@ import { createQueryKeys, mergeQueryKeys } from '@lukemorales/query-key-factory'
 import { QueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { IOutputField, IProject, ProjectSchema } from './schemas'
+import { IOutlet, IOutputField, IProject, ProjectSchema } from './schemas'
 import { storage } from './storage'
 
 export const queryClient = new QueryClient({
@@ -27,6 +27,14 @@ const defaultProject: IProject = {
       hint: 'Field hint',
     },
   ],
+  outlets: [
+    {
+      id: 'DEFAULT_OUTLET_ID',
+      outlet: 'airtable',
+      baseId: 'appoodzGBt25yz8UE',
+      tableId: 'tblXVIPnMb0zDu3Hv',
+    },
+  ],
 }
 
 storage.get('projects').then((projects) => {
@@ -47,6 +55,10 @@ const projectQueries = createQueryKeys('project', {
       field: (fieldId: string) => ({
         queryKey: [fieldId],
         queryFn: () => getField(projectId, fieldId),
+      }),
+      outlet: (outletId: string) => ({
+        queryKey: [outletId],
+        queryFn: () => getOutlet(projectId, outletId),
       }),
     },
   }),
@@ -78,6 +90,13 @@ export async function getField(projectId: string, fieldId: string): Promise<IOut
   const field = project.fields.find((f) => f.id === fieldId)
   if (!field) throw new Error(`Field ${fieldId} not found`)
   return field
+}
+
+export async function getOutlet(projectId: string, outletId: string): Promise<IOutlet> {
+  const project = await getProject(projectId)
+  const outlet = project.outlets.find((o) => o.id === outletId)
+  if (!outlet) throw new Error(`Field ${outletId} not found`)
+  return outlet
 }
 
 export const Q = mergeQueryKeys(projectQueries)
