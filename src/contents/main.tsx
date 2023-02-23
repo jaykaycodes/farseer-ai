@@ -7,6 +7,7 @@ import { TOGGLE_PLUGIN_VISIBILITY } from '~lib/constants'
 import { queryClient } from '~lib/queries'
 import FieldPage, { loader as fieldLoader } from '~pages/field'
 import HomePage, { loader as homeLoader } from '~pages/home'
+import OutletPage, { loader as outletLoader } from '~pages/outlet'
 
 import cssText from 'data-text:~tailwind.css'
 
@@ -20,6 +21,11 @@ export const router = createMemoryRouter([
     path: '/field/:fieldId',
     element: <FieldPage />,
     loader: fieldLoader,
+  },
+  {
+    path: '/outlet/:outletId',
+    element: <OutletPage />,
+    loader: outletLoader,
   },
 ])
 
