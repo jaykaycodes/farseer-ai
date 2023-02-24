@@ -8,6 +8,7 @@ const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
 const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateResponse> = async (req, res) => {
   if (!req.body || req.body.content.length === 0) {
     res.send({
+      ok: false,
       error: 'Content was empty',
     })
     return
@@ -40,10 +41,11 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
     presence_penalty: 0,
   })
 
-  const output = `${outputPrefix}${response.completion}`
+  const result = `${outputPrefix}${response.completion}`
   res.send({
+    ok: true,
     prompt,
-    output,
+    result,
   })
 }
 

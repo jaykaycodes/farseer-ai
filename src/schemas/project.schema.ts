@@ -1,17 +1,25 @@
 import { z } from 'zod'
 
-export const OutletConfigSchema = z.discriminatedUnion('type', [
-  z.object({
-    id: z.string(),
-    type: z.literal('airtable'),
-    baseId: z.string(),
-    tableId: z.string(),
-  }),
-  z.object({
-    id: z.string(),
-    type: z.literal('csv'),
-  }),
-])
+export enum OutletType {
+  Airtable = 'airtable',
+  CSV = 'csv',
+}
+
+export const CsvOutletSchema = z.object({
+  type: z.literal(OutletType.CSV),
+  id: z.string(),
+})
+export type ICsvOutletConfig = z.infer<typeof CsvOutletSchema>
+
+export const AirtableOutletSchema = z.object({
+  type: z.literal(OutletType.Airtable),
+  id: z.string(),
+  baseId: z.string(),
+  tableId: z.string(),
+})
+export type IAirtableOutletConfig = z.infer<typeof AirtableOutletSchema>
+
+export const OutletConfigSchema = z.discriminatedUnion('type', [AirtableOutletSchema, CsvOutletSchema])
 export type IOutletConfig = z.infer<typeof OutletConfigSchema>
 
 export const FieldConfigSchema = z.object({

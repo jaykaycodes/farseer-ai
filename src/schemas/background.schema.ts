@@ -19,19 +19,26 @@ export const GenerateRequestSchema = z.object({
 })
 export type IGenerateRequest = z.infer<typeof GenerateRequestSchema>
 
-export const GenerateResponseSchema = z.union([
+export const GenerateResponseSchema = z.discriminatedUnion('ok', [
   z.object({
+    ok: z.literal(false),
     error: z.string(),
   }),
   z.object({
-    output: z.string(),
+    ok: z.literal(true),
     prompt: z.string(),
+    result: z.string(),
   }),
 ])
 export type IGenerateResponse = z.infer<typeof GenerateResponseSchema>
 
+// TODO: Can we parse it out more specifically than `z.any()`?
+/** Represents the result of `generate` after parsing. Can be any valid JSON object. */
+export const ParsedResultSchema = z.record(z.any())
+export type IParsedResult = z.infer<typeof ParsedResultSchema>
+
 export const OutletRequestSchema = z.object({
-  payload: z.record(z.union([z.string(), z.number(), z.boolean()])),
+  payload: ParsedResultSchema,
   config: OutletConfigSchema,
 })
 export type IOutletRequest = z.infer<typeof OutletRequestSchema>
