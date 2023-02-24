@@ -9,7 +9,7 @@ import {
   useDeleteProjectFieldMutation,
   useSubmitRequestMutation,
 } from '~lib/mutations'
-import { Parser } from '~lib/parser'
+import { getSensibleParser4Host } from '~lib/parsers/factories'
 import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
 import type { IOutlet, IOutputField } from '~lib/schemas'
 import { tw } from '~lib/utils'
@@ -28,7 +28,7 @@ const HomePage = () => {
     if (!project) return
 
     // store parser manual override for project
-    const parser = Parser.getSensibleParser4Host(new URL(window.location.href))
+    const parser = getSensibleParser4Host(new URL(window.location.href))
 
     await submitRequest({
       content: parser.doc2Prompt(document),
