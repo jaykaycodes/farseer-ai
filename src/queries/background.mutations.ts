@@ -10,12 +10,12 @@ async function submitRequest(body: IGenerateRequest): Promise<string> {
   })
 
   const res = GenerateResponseSchema.parse(_res)
-  if ('output' in res) {
+  if (res.ok) {
     if (process.env.NODE_ENV === 'development') {
       console.log('Success! The prompt used was:')
       console.log(res.prompt)
     }
-    return res.output
+    return res.result
   }
 
   throw res.error

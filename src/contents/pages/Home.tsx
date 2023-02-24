@@ -14,7 +14,7 @@ import {
   useDeleteProjectFieldMutation,
   useSubmitRequestMutation,
 } from '~queries'
-import { GenerateRequestSchema, IFieldConfig, IOutletConfig } from '~schemas'
+import { GenerateRequestSchema, IFieldConfig, IOutletConfig, OutletType } from '~schemas'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
 
@@ -66,7 +66,7 @@ const HomePage = () => {
       projectId: DEFAULT_PROJECT_ID,
       outlet: {
         id,
-        type: 'airtable',
+        type: OutletType.Airtable,
         baseId: 'app123',
         tableId: 'table123',
       },
