@@ -5,7 +5,7 @@ import { Parser } from './base'
 
 export class LinkedProfileParser extends Parser {
   static isSensible(url: URL): boolean {
-    return url.pathname.startsWith('/in/') && url.host.endsWith('linkedin.com')
+    return /\/in\/[a-zA-Z0-9-]*(\/)?$/gi.test(url.pathname) && url.host.endsWith('linkedin.com')
   }
 
   _doc2Prompt(document: Document): string {

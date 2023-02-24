@@ -9,7 +9,7 @@ specifiers:
   '@tanstack/query-core': ^4.24.9
   '@tanstack/react-query': ^4.24.9
   '@types/chrome': 0.0.210
-  '@types/lodash': ^4.14.191
+  '@types/lodash-es': ^4.17.6
   '@types/node': 18.11.18
   '@types/react': 18.0.27
   '@types/react-dom': 18.0.10
@@ -29,7 +29,7 @@ specifiers:
   eslint-plugin-simple-import-sort: ^9.0.0
   eslint-plugin-tailwindcss: ^3.8.2
   eslint-plugin-unused-imports: ^2.0.0
-  lodash: ^4.17.21
+  lodash-es: ^4.17.21
   lucide-react: ^0.115.0
   node-html-parser: ^6.1.4
   openai-fetch: ^1.0.3
@@ -55,11 +55,11 @@ dependencies:
   '@tanstack/query-core': 4.24.9
   '@tanstack/react-query': 4.24.9_biqbaboplfbrettd7655fr4n2y
   daisyui: 2.50.2_gbtt6ss3tbiz4yjtvdr6fbrj44
-  lodash: 4.17.21
+  lodash-es: 4.17.21
   lucide-react: 0.115.0_react@18.2.0
   node-html-parser: 6.1.4
   openai-fetch: 1.0.3
-  plasmo: 0.65.0_caz4rp5f2m5b5pfnyfvfyyugpi
+  plasmo: 0.65.0_gjpyg5imi5mt2gbvkmn3a4dr7m
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-hook-form: 7.43.1_react@18.2.0
@@ -69,7 +69,7 @@ dependencies:
 
 devDependencies:
   '@types/chrome': 0.0.210
-  '@types/lodash': 4.14.191
+  '@types/lodash-es': 4.17.6
   '@types/node': 18.11.18
   '@types/react': 18.0.27
   '@types/react-dom': 18.0.10
@@ -1720,7 +1720,7 @@ packages:
       nullthrows: 1.1.1
     dev: false
 
-  /@plasmohq/consolidate/0.17.0_pvnihi4muhoy7kenlmiyxwzuqy:
+  /@plasmohq/consolidate/0.17.0_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-Na8imBnvzYPtzkK+9Uv9hPZ/oJti/0jgiQWD222SHxHw2QCVuR4KzslxXCy/rS8gGluSiTs1BGVvc3d2O6aJCA==}
     engines: {node: '>= 0.10.0'}
     peerDependencies:
@@ -1865,7 +1865,6 @@ packages:
         optional: true
     dependencies:
       bluebird: 3.7.2
-      lodash: 4.17.21
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
@@ -1900,7 +1899,7 @@ packages:
       nullthrows: 1.1.1
     dev: false
 
-  /@plasmohq/parcel-config/0.31.1_caz4rp5f2m5b5pfnyfvfyyugpi:
+  /@plasmohq/parcel-config/0.31.1_gjpyg5imi5mt2gbvkmn3a4dr7m:
     resolution: {integrity: sha512-isvvZ92FPkh10edjdbIYdabdYzCRBd9HIszv2Ggdwf3Lu7OXPYqNwnQ5Ga1EBF/kj6dAX23fQmwT+n+mZFe2NQ==}
     dependencies:
       '@parcel/config-default': 2.8.3_2dqjxujgcancinq7vgq5cpolwy
@@ -1933,7 +1932,7 @@ packages:
       '@plasmohq/parcel-transformer-inline-css': 0.3.1
       '@plasmohq/parcel-transformer-manifest': 0.13.6
       '@plasmohq/parcel-transformer-svelte3': 0.4.3
-      '@plasmohq/parcel-transformer-vue3': 0.3.5_pvnihi4muhoy7kenlmiyxwzuqy
+      '@plasmohq/parcel-transformer-vue3': 0.3.5_biqbaboplfbrettd7655fr4n2y
     transitivePeerDependencies:
       - '@swc/core'
       - arc-templates
@@ -2114,7 +2113,7 @@ packages:
       '@parcel/utils': 2.8.3
     dev: false
 
-  /@plasmohq/parcel-transformer-vue3/0.3.5_pvnihi4muhoy7kenlmiyxwzuqy:
+  /@plasmohq/parcel-transformer-vue3/0.3.5_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-up0x41Eh0WYwJxUMD/JATy3M0l1kEB2KrD8cRIQ+K6wXgcJxX6RZ88TjyG1fqvvEjPfaDHlESTsyq52TNbJzpg==}
     engines: {parcel: '>= 2.7.0'}
     dependencies:
@@ -2124,7 +2123,7 @@ packages:
       '@parcel/source-map': 2.1.1
       '@parcel/types': 2.8.3_@parcel+core@2.8.3
       '@parcel/utils': 2.8.3
-      '@plasmohq/consolidate': 0.17.0_pvnihi4muhoy7kenlmiyxwzuqy
+      '@plasmohq/consolidate': 0.17.0_biqbaboplfbrettd7655fr4n2y
       '@vue/compiler-sfc': 3.2.45
       nullthrows: 1.1.1
       semver: 7.3.8
@@ -2422,6 +2421,12 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/lodash-es/4.17.6:
+    resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
+    dependencies:
+      '@types/lodash': 4.14.191
     dev: true
 
   /@types/lodash/4.14.191:
@@ -5272,6 +5277,10 @@ packages:
       p-locate: 5.0.0
     dev: true
 
+  /lodash-es/4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
+
   /lodash.defaults/4.2.0:
     resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
     dev: false
@@ -5831,7 +5840,7 @@ packages:
     engines: {node: '>= 6'}
     dev: false
 
-  /plasmo/0.65.0_caz4rp5f2m5b5pfnyfvfyyugpi:
+  /plasmo/0.65.0_gjpyg5imi5mt2gbvkmn3a4dr7m:
     resolution: {integrity: sha512-DQxlGOf5mnw5BHLCPlkA44DIemoUXsnSmqpiFIwFlLFpVPLDYG0OSsgDBqNiwLbx6uzD8yONgaUHjQDBHDt/7A==}
     hasBin: true
     dependencies:
@@ -5841,7 +5850,7 @@ packages:
       '@parcel/package-manager': 2.8.3_@parcel+core@2.8.3
       '@parcel/watcher': 2.1.0
       '@plasmohq/init': 0.6.0
-      '@plasmohq/parcel-config': 0.31.1_caz4rp5f2m5b5pfnyfvfyyugpi
+      '@plasmohq/parcel-config': 0.31.1_gjpyg5imi5mt2gbvkmn3a4dr7m
       archiver: 5.3.1
       buffer: 6.0.3
       chalk: 5.2.0
