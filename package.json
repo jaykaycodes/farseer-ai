@@ -24,6 +24,7 @@
     "node-html-parser": "^6.1.4",
     "openai-fetch": "^1.0.3",
     "plasmo": "0.65.0",
+    "posthog-js": "^1.46.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.1",

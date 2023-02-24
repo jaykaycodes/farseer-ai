@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
+import posthog from 'posthog-js'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 
 import MainLayout from '~components/MainLayout'
@@ -37,6 +38,18 @@ export const getStyle = () => {
 
 const PlasmoOverlay = () => {
   const [show, setShow] = useState(process.env.NODE_ENV === 'development')
+  const [initialShow, setInitialShow] = useState(true)
+
+  useEffect(() => {
+    if (initialShow && process.env.NODE_ENV === 'production') {
+      // services to set up on initial show
+      posthog.init('phc_mJ3okP8NlaYiTig5EInaCIjcKCSXK8kv43EWrUcQxBh', {
+        api_host: 'https://app.posthog.com',
+        autocapture: false,
+      })
+      setInitialShow(false)
+    }
+  }, [show])
 
   useEffect(() => {
     const recvMsg = (msg: unknown) => {
