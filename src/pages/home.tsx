@@ -9,10 +9,10 @@ import {
   useDeleteProjectFieldMutation,
   useSubmitRequestMutation,
 } from '~lib/mutations'
-import { getSensibleParser4Host } from '~lib/parsers/factories'
 import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
 import type { IOutlet, IOutputField } from '~lib/schemas'
 import { tw } from '~lib/utils'
+import { getSensibleParser4Host } from '~parsers/factories'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
 

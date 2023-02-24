@@ -1,6 +1,6 @@
 import { HTMLElement, NodeType, parse } from 'node-html-parser'
 
-import { HTMLTagAllowList } from '../utils'
+import { HTMLTagAllowList } from '../lib/utils'
 import { Parser } from './base'
 
 export class RawParser extends Parser {
