@@ -1,49 +1,11 @@
-import { createQueryKeys, mergeQueryKeys } from '@lukemorales/query-key-factory'
-import { QueryClient } from '@tanstack/react-query'
+import { createQueryKeys } from '@lukemorales/query-key-factory'
 import { z } from 'zod'
 
-import { IOutlet, IOutputField, IProject, ProjectSchema } from './schemas'
-import { storage } from './storage'
+import { defaultProject } from '~lib/constants'
+import { storage } from '~lib/storage'
+import { IFieldConfig, IOutletConfig, IProject, ProjectSchema } from '~schemas'
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // We should only refetch when explicitly runs a query
-      refetchOnWindowFocus: false,
-      // Alert user of errors & let them decide what to do
-      retry: false,
-    },
-  },
-})
-
-export const DEFAULT_PROJECT_ID = 'DEFAULT_PROJECT_ID'
-const defaultProject: IProject = {
-  id: DEFAULT_PROJECT_ID,
-  name: 'Default',
-  fields: [
-    {
-      id: 'DEFAULT_FIELD_ID',
-      name: 'Default field',
-      hint: 'Field hint',
-    },
-  ],
-  outlets: [
-    {
-      id: 'DEFAULT_OUTLET_ID',
-      outlet: 'airtable',
-      baseId: 'appoodzGBt25yz8UE',
-      tableId: 'tblXVIPnMb0zDu3Hv',
-    },
-  ],
-}
-
-storage.get('projects').then((projects) => {
-  if (!projects || projects.length === 0) {
-    storage.set('projects', [defaultProject])
-  }
-})
-
-const projectQueries = createQueryKeys('project', {
+export const projectQueries = createQueryKeys('project', {
   list: {
     queryKey: null,
     queryFn: getProjects,
@@ -54,11 +16,11 @@ const projectQueries = createQueryKeys('project', {
     contextQueries: {
       field: (fieldId: string) => ({
         queryKey: [fieldId],
-        queryFn: () => getField(projectId, fieldId),
+        queryFn: () => getProjectField(projectId, fieldId),
       }),
       outlet: (outletId: string) => ({
         queryKey: [outletId],
-        queryFn: () => getOutlet(projectId, outletId),
+        queryFn: () => getProjectOutlet(projectId, outletId),
       }),
     },
   }),
@@ -85,18 +47,16 @@ export async function getProject(projectId: string): Promise<IProject> {
   return project
 }
 
-export async function getField(projectId: string, fieldId: string): Promise<IOutputField> {
+export async function getProjectField(projectId: string, fieldId: string): Promise<IFieldConfig> {
   const project = await getProject(projectId)
   const field = project.fields.find((f) => f.id === fieldId)
   if (!field) throw new Error(`Field ${fieldId} not found`)
   return field
 }
 
-export async function getOutlet(projectId: string, outletId: string): Promise<IOutlet> {
+export async function getProjectOutlet(projectId: string, outletId: string): Promise<IOutletConfig> {
   const project = await getProject(projectId)
   const outlet = project.outlets.find((o) => o.id === outletId)
   if (!outlet) throw new Error(`Field ${outletId} not found`)
   return outlet
 }
-
-export const Q = mergeQueryKeys(projectQueries)

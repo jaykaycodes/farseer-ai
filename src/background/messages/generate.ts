@@ -1,11 +1,11 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
 
-import type { ISubmitRequest, ISubmitResponse } from '~lib/schemas'
+import type { IGenerateRequest, IGenerateResponse } from '~schemas'
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
 
-const handler: PlasmoMessaging.MessageHandler<ISubmitRequest, ISubmitResponse> = async (req, res) => {
+const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateResponse> = async (req, res) => {
   if (!req.body || req.body.content.length === 0) {
     res.send({
       error: 'Content was empty',
@@ -16,7 +16,7 @@ const handler: PlasmoMessaging.MessageHandler<ISubmitRequest, ISubmitResponse> =
   let prompt = `Given this html:`
   prompt += `"""\n${req.body.content}\n"""\n`
   prompt += 'Generate JSON with this structure:\n'
-  prompt += JSON.stringify(req.body.outputFields)
+  prompt += JSON.stringify(req.body.fields)
   // prompt += `{\n`
   // req.body.outFields.forEach((field, index) => {
   //   prompt += `  // ${field.hint}\n`
@@ -27,7 +27,7 @@ const handler: PlasmoMessaging.MessageHandler<ISubmitRequest, ISubmitResponse> =
   // prompt += `}\n`
 
   // Need to add a prefix but also add it to our output
-  const outputPrefix = `\n{"${req.body.outputFields[0].name}":"`
+  const outputPrefix = `\n{"${req.body.fields[0].name}":"`
   prompt += outputPrefix
 
   const response = await openai.createCompletion({
