@@ -5,21 +5,21 @@ import { useForm } from 'react-hook-form'
 import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import TextField from '~components/fields/TextField'
-import { useDeleteOutletMutation, useUpdateOutletMutation } from '~lib/mutations'
-import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
-import { IOutlet, OutletSchema } from '~lib/schemas'
+import { DEFAULT_PROJECT_ID } from '~lib/constants'
 import { tw } from '~lib/utils'
+import { Q, queryClient, useDeleteOutletMutation, useUpdateOutletMutation } from '~queries'
+import { IOutletConfig, OutletConfigSchema } from '~schemas'
 
 const outletQuery = (projectId: string, outletId: string) => Q.project.detail(projectId)._ctx.outlet(outletId)
 
-const OutletPage = () => {
+const EditOutletPage = () => {
   const projectId = DEFAULT_PROJECT_ID
   const navigate = useNavigate()
   const outletId = useParams().outletId!
   const { data } = useQuery(outletQuery(projectId, outletId))
   const { mutate } = useUpdateOutletMutation()
-  const { register, handleSubmit, formState } = useForm({
-    resolver: zodResolver(OutletSchema),
+  const { register, handleSubmit } = useForm({
+    resolver: zodResolver(OutletConfigSchema),
     values: data,
     mode: 'onSubmit',
   })
@@ -43,11 +43,11 @@ const OutletPage = () => {
       </div>
 
       <form
-        onSubmit={handleSubmit((outlet: IOutlet) => {
+        onSubmit={handleSubmit((outlet: IOutletConfig) => {
           mutate({ projectId, outlet })
         })}
       >
-        <TextField label="Outlet" defaultValue={'airtable'} autoComplete="off" {...register('outlet')} />
+        <TextField label="Outlet" defaultValue={'airtable'} autoComplete="off" {...register('type')} />
         <TextField label="Base ID" placeholder="appoodzGBt25yz8UE" autoComplete="off" {...register('baseId')} />
         <TextField label="Table ID" placeholder="tblXVIPnMb0zDu3Hv" autoComplete="off" {...register('tableId')} />
 
@@ -60,7 +60,7 @@ const OutletPage = () => {
   )
 }
 
-export default OutletPage
+export default EditOutletPage
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const projectId = DEFAULT_PROJECT_ID

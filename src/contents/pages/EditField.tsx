@@ -6,21 +6,21 @@ import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-d
 
 import TextAreaField from '~components/fields/TextAreaField'
 import TextField from '~components/fields/TextField'
-import { useDeleteProjectFieldMutation, useUpdateProjectFieldMutation } from '~lib/mutations'
-import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
-import { IOutputField, OutputFieldSchema } from '~lib/schemas'
+import { DEFAULT_PROJECT_ID } from '~lib/constants'
 import { tw } from '~lib/utils'
+import { Q, queryClient, useDeleteProjectFieldMutation, useUpdateProjectFieldMutation } from '~queries'
+import { FieldConfigSchema, IFieldConfig } from '~schemas'
 
 const fieldQuery = (projectId: string, fieldId: string) => Q.project.detail(projectId)._ctx.field(fieldId)
 
-const FieldPage = () => {
+const EditFieldPage = () => {
   const projectId = DEFAULT_PROJECT_ID
   const navigate = useNavigate()
   const fieldId = useParams().fieldId!
   const { data } = useQuery(fieldQuery(projectId, fieldId))
   const { mutate } = useUpdateProjectFieldMutation()
   const { register, handleSubmit, formState } = useForm({
-    resolver: zodResolver(OutputFieldSchema),
+    resolver: zodResolver(FieldConfigSchema),
     values: data,
     mode: 'onBlur',
   })
@@ -44,7 +44,7 @@ const FieldPage = () => {
       </div>
 
       <form
-        onBlur={handleSubmit((field: IOutputField) => {
+        onBlur={handleSubmit((field: IFieldConfig) => {
           mutate({ projectId, field })
         })}
         className={tw('mt-3 space-y-2', formState.isSubmitting && 'disabled')}
@@ -79,7 +79,7 @@ const FieldPage = () => {
   )
 }
 
-export default FieldPage
+export default EditFieldPage
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const projectId = DEFAULT_PROJECT_ID

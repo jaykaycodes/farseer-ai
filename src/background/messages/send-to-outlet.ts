@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 
-import type { IOutletRequest, IOutletResponse } from '~lib/schemas'
+import type { IOutletRequest, IOutletResponse } from '~schemas'
 
 const handler: PlasmoMessaging.MessageHandler<IOutletRequest, IOutletResponse> = async (req, res) => {
   const body = req.body
@@ -12,17 +12,16 @@ const handler: PlasmoMessaging.MessageHandler<IOutletRequest, IOutletResponse> =
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      records: [{ fields: { url: body.url, time: new Date().toLocaleTimeString(), ...body.output } }],
+      records: [{ fields: { url: body?.payload?.url, time: new Date().toLocaleTimeString(), ...body?.payload } }],
     }),
   })
 
   if (_res.status === 200) {
-    res.send({
-      ok: _res.ok,
-    })
+    res.send({ ok: true })
     return
   } else {
     res.send({
+      ok: false,
       error: _res.statusText || 'Unknown error',
     })
     return

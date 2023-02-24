@@ -4,11 +4,11 @@ import posthog from 'posthog-js'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 
 import MainLayout from '~components/MainLayout'
+import EditFieldPage, { loader as editFieldLoader } from '~contents/pages/EditField'
+import EditOutletPage, { loader as editOutletLoader } from '~contents/pages/EditOutlet'
+import HomePage, { loader as homeLoader } from '~contents/pages/Home'
 import { TOGGLE_PLUGIN_VISIBILITY } from '~lib/constants'
-import { queryClient } from '~lib/queries'
-import FieldPage, { loader as fieldLoader } from '~pages/field'
-import HomePage, { loader as homeLoader } from '~pages/home'
-import OutletPage, { loader as outletLoader } from '~pages/outlet'
+import { queryClient } from '~queries'
 
 import cssText from 'data-text:~tailwind.css'
 
@@ -20,13 +20,13 @@ export const router = createMemoryRouter([
   },
   {
     path: '/field/:fieldId',
-    element: <FieldPage />,
-    loader: fieldLoader,
+    element: <EditFieldPage />,
+    loader: editFieldLoader,
   },
   {
     path: '/outlet/:outletId',
-    element: <OutletPage />,
-    loader: outletLoader,
+    element: <EditOutletPage />,
+    loader: editOutletLoader,
   },
 ])
 

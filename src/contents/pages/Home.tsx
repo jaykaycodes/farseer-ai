@@ -3,16 +3,18 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate } from 'react-router-dom'
 
+import { DEFAULT_PROJECT_ID } from '~lib/constants'
+import { getSensibleParser4Host } from '~lib/parsers/factories'
+import { tw } from '~lib/utils'
 import {
+  Q,
+  queryClient,
   useCreateOutletMutation,
   useCreateProjectFieldMutation,
   useDeleteProjectFieldMutation,
   useSubmitRequestMutation,
-} from '~lib/mutations'
-import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
-import type { IOutlet, IOutputField } from '~lib/schemas'
-import { tw } from '~lib/utils'
-import { getSensibleParser4Host } from '~parsers/factories'
+} from '~queries'
+import { GenerateRequestSchema, IFieldConfig, IOutletConfig } from '~schemas'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
 
@@ -30,10 +32,13 @@ const HomePage = () => {
     // store parser manual override for project
     const parser = getSensibleParser4Host(new URL(window.location.href))
 
-    await submitRequest({
+    // TODO clean this up - but basically we want to validate the data is filled in before passing to background
+    const data = GenerateRequestSchema.parse({
       content: parser.doc2Prompt(document),
       outputFields: project.fields,
     })
+
+    await submitRequest(data)
 
     // TODO: add output to execution history & navigate to it
   }
@@ -61,7 +66,7 @@ const HomePage = () => {
       projectId: DEFAULT_PROJECT_ID,
       outlet: {
         id,
-        outlet: 'airtable',
+        type: 'airtable',
         baseId: 'app123',
         tableId: 'table123',
       },
@@ -78,7 +83,7 @@ const HomePage = () => {
   //   const url = pageURL.href
 
   //   const res = await sendToBackground<IOutletRequest, IOutletResponse>({
-  //     name: 'sendToOutlet',
+  //     name: 'send-to-outlet',
   //     body: {
   //       outlet,
   //       url,
@@ -187,7 +192,7 @@ export const loader = ({ params: _ }: LoaderFunctionArgs) => {
 export default HomePage
 
 interface FieldListItemProps {
-  field: IOutputField
+  field: IFieldConfig
   onDelete?: () => void
 }
 
@@ -227,14 +232,14 @@ const FieldListItem = ({ field }: FieldListItemProps) => (
 )
 
 interface OutletListItemProps {
-  outlet: IOutlet
+  outlet: IOutletConfig
 }
 
 const OutletListItem = ({ outlet }: OutletListItemProps) => (
   <li className="hover:bg-base-200">
     <Link to={`/outlet/${outlet.id}`} className="flex justify-between p-2">
       <div>
-        <h3 className="text-sm font-semibold">{outlet.outlet}</h3>
+        <h3 className="text-sm font-semibold">{outlet.type}</h3>
       </div>
 
       <div className="flex items-center gap-x-1">
