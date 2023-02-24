@@ -11,7 +11,8 @@ import {
 } from '~lib/mutations'
 import { DEFAULT_PROJECT_ID, Q, queryClient } from '~lib/queries'
 import type { IOutlet, IOutputField } from '~lib/schemas'
-import { doc2HTMLString, tw } from '~lib/utils'
+import { tw } from '~lib/utils'
+import { getSensibleParser4Host } from '~parsers/factories'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
 
@@ -26,8 +27,11 @@ const HomePage = () => {
   const handleSubmit = async () => {
     if (!project) return
 
+    // store parser manual override for project
+    const parser = getSensibleParser4Host(new URL(window.location.href))
+
     await submitRequest({
-      content: doc2HTMLString(document),
+      content: parser.doc2Prompt(document),
       outputFields: project.fields,
     })
 
