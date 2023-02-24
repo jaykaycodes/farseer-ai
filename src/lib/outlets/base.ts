@@ -1,6 +1,12 @@
 import type { IOutletResponse, IParsedResult } from '~schemas'
 
-export abstract class OutletBase {
+export abstract class OutletBase<OutletConfig> {
+  protected cfg: OutletConfig
+
+  constructor(cfg: OutletConfig) {
+    this.cfg = cfg
+  }
+
   async send(payload: IParsedResult): Promise<IOutletResponse> {
     try {
       await this._send(payload)

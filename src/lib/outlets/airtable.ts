@@ -2,14 +2,7 @@ import type { IAirtableOutletConfig, IParsedResult } from '~schemas'
 
 import { OutletBase } from './base'
 
-export class AirtableOutlet extends OutletBase {
-  private cfg: IAirtableOutletConfig
-
-  constructor(cfg: IAirtableOutletConfig) {
-    super()
-    this.cfg = cfg
-  }
-
+export class AirtableOutlet extends OutletBase<IAirtableOutletConfig> {
   async _send(payload: IParsedResult): Promise<any> {
     const res = await fetch(`https://api.airtable.com/v0/${this.cfg.baseId}/${this.cfg.tableId}`, {
       method: 'POST',
