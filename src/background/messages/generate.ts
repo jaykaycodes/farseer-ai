@@ -37,12 +37,15 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
       model: 'text-davinci-003',
       prompt,
       temperature: 0,
+      max_tokens: 800,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
+      logit_bias: { '8423': 6 },
+      stop: '}',
     })
 
-    const result = `${outputPrefix}${response.completion}`
+    const result = `${outputPrefix}${response.completion} }`
     storage.set('output', result)
     res.send({
       ok: true,

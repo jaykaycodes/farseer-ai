@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
-import { getSensibleParser4Host } from '~lib/parsers/factories'
+import { getSensibleParser4Host } from '~lib/parsers/utils'
 import { useOutput } from '~lib/storage'
 import { tw } from '~lib/utils'
 import {

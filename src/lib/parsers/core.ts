@@ -1,6 +1,5 @@
-import { HTMLElement, NodeType, parse } from 'node-html-parser'
+import { HTMLElement, NodeType, parse, TextNode } from 'node-html-parser'
 
-import { HTMLTagAllowList } from '../utils'
 import { Parser } from './base'
 
 export class RawParser extends Parser {
@@ -32,6 +31,23 @@ export class OptimisticParser extends Parser {
       return content
     }
 
+    // if fails, try to get the main class elements
+    const mainClassHTMLCollection = document.getElementsByClassName('main')
+    if (mainClassHTMLCollection.length > 0) {
+      let idx = 0
+      while (mainClassHTMLCollection.item(idx) !== null) {
+        content += mainClassHTMLCollection.item(idx)?.outerHTML
+        idx++
+      }
+      return content
+    }
+
+    // if fails, try to get the main id element
+    const mainIdHTMLCollection = document.getElementById('main')
+    if (mainIdHTMLCollection !== null) {
+      return mainIdHTMLCollection.outerHTML
+    }
+
     // if fails, try to get the content element
     const contentHTMLCollection = document.getElementsByClassName('content')
     if (contentHTMLCollection.length > 0) {
@@ -56,6 +72,7 @@ export class OptimisticParser extends Parser {
 
   private _optimisticHTMLStr2PromptStr(htmlString: string): string {
     const rootElement = parse(`<html>${htmlString}</html>`)
+
     let GPTStr = ''
 
     const traverse = (element: HTMLElement, depth: number) => {
@@ -63,46 +80,41 @@ export class OptimisticParser extends Parser {
         return
       }
       element.childNodes.forEach((child) => {
-        if (child.nodeType === NodeType.TEXT_NODE && child.text.trim() !== '') {
-          const parent = child.parentNode
-          if (HTMLTagAllowList.includes(parent.tagName)) {
-            const childContent = child.textContent.trim()
-            if (/[a-zA-Z0-9]/gi.test(childContent)) {
-              GPTStr += `\n<${parent.tagName}> ${childContent}`
-            }
+        if (child.nodeType === NodeType.TEXT_NODE) {
+          const newLine = this.getNextLine(child as TextNode)
 
-            // const compareDataRegex = new RegExp('data', 'g')
-            // Object.entries(parent.attributes).forEach(([key, value]) => {
-            //   if ((compareDataRegex.test(key) || ['id', 'class'].includes(key)) && value.trim() !== '') {
-            //     newElement += `${value} `
-            //   }
-            // })
+          if (newLine !== null) {
+            GPTStr += newLine
           }
-        } else if (child.nodeType === NodeType.ELEMENT_NODE) {
-          const childEle = child as HTMLElement
 
+          return
+        }
+
+        if (child.nodeType === NodeType.ELEMENT_NODE) {
+          const castedChild = child as HTMLElement
           // if they are Meta tags representing title or description add them to the prompt
-          if (
-            childEle.tagName === 'META' &&
-            (Object.hasOwn(childEle.attrs, 'name') || Object.hasOwn(childEle.attrs, 'property'))
-          ) {
-            if (
-              /title|description/gi.test(childEle.attrs.name) ||
-              /title|description/gi.test(childEle.attrs.property)
-            ) {
-              GPTStr += `\n<META> ${childEle.attrs.content}`
+          if (castedChild.tagName === 'META') {
+            const newLine = this.getMetaTagLine(castedChild)
+
+            if (newLine !== null) {
+              GPTStr += newLine
             }
-            // don't parse children if they are in a nav or footer or menu
-          } else if (
-            ['NAV', 'FOOTER', 'ASIDE'].includes(childEle.tagName) ||
-            /nav|footer|menu/gi.test(childEle.attrs['class'] || '') ||
-            /nav|footer|menu/gi.test(childEle.attrs['id'] || '')
+            return
+          }
+
+          // if it is nav or footer, skip it
+          if (
+            ['NAV', 'FOOTER', 'ASIDE'].includes(castedChild.tagName) ||
+            /nav|footer|menu/gi.test(castedChild.attrs['class'] || '') ||
+            /nav|footer|menu/gi.test(castedChild.attrs['id'] || '')
           ) {
             return
-          } else {
-            traverse(child as HTMLElement, depth + 1)
           }
+
+          traverse(castedChild, depth + 1)
         }
+
+        return
       })
     }
 
