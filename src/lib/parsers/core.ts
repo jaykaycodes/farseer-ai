@@ -3,7 +3,7 @@ import { HTMLElement, NodeType, parse, TextNode } from 'node-html-parser'
 import { Parser } from './base'
 
 export class RawParser extends Parser {
-  _doc2Prompt(document: Document): string {
+  _doc2Html4Prompt(document: Document): string {
     return document.getElementsByTagName('html')[0].outerHTML
   }
 }
@@ -123,7 +123,7 @@ export class OptimisticParser extends Parser {
     return GPTStr
   }
 
-  _doc2Prompt(document: Document): string {
+  _doc2Html4Prompt(document: Document): string {
     const optimisticHtmlStr = this._doc2OptimisticHTMLStr(document)
     return this._optimisticHTMLStr2PromptStr(optimisticHtmlStr)
   }

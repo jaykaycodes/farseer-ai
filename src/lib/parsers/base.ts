@@ -4,8 +4,14 @@ import type { HTMLElement, TextNode } from 'node-html-parser'
 import { HTMLTagAllowList } from '~lib/parsers/utils'
 
 export abstract class Parser {
-  doc2Prompt(document: Document): string {
-    return this._doc2Prompt(document).slice(0, 20000).trim()
+  protected static htmlCharacterLimit = 14000
+  doc2Html4Prompt(document: Document): { html4Prompt: string; isTruncated: boolean } {
+    const parsedHTML = this._doc2Html4Prompt(document)
+
+    return {
+      html4Prompt: parsedHTML.slice(0, Parser.htmlCharacterLimit).trim(),
+      isTruncated: parsedHTML.length > Parser.htmlCharacterLimit,
+    }
   }
 
   protected encodedLastAppenedLine: string | null = null
@@ -103,7 +109,7 @@ export abstract class Parser {
     return null
   }
 
-  _doc2Prompt(_document: Document): string {
+  _doc2Html4Prompt(_document: Document): string {
     throw new Error('Not implemented')
   }
 }
