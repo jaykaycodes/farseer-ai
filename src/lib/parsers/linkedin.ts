@@ -1,6 +1,5 @@
-import { HTMLElement, NodeType, parse } from 'node-html-parser'
+import { HTMLElement, NodeType, parse, TextNode } from 'node-html-parser'
 
-import { HTMLTagAllowList } from '../utils'
 import { Parser } from './base'
 
 export class LinkedProfileParser extends Parser {
@@ -32,45 +31,49 @@ export class LinkedProfileParser extends Parser {
         return
       }
       element.childNodes.forEach((child) => {
-        if (child.nodeType === NodeType.TEXT_NODE && child.text.trim() !== '') {
+        if (child.nodeType === NodeType.TEXT_NODE) {
           const parent = child.parentNode
-          const parentClass = parent.attrs['class'] || ''
-          if (HTMLTagAllowList.includes(parent.tagName) && !parentClass.includes('visually-hidden')) {
-            const childContent = child.textContent.trim()
-            if (/[a-zA-Z0-9]/gi.test(childContent)) {
-              // Goes up an extra leve because linkedin wraps all in spans
-              GPTStr += `\n<${parent.parentNode.tagName}> ${childContent}`
-            }
+
+          if ((parent.attrs['class'] || '').includes('visually-hidden')) {
+            return
           }
-        } else if (child.nodeType === NodeType.ELEMENT_NODE) {
-          const childEle = child as HTMLElement
+
+          const newLine = this.getNextLine(child as TextNode)
+
+          if (newLine !== null) {
+            GPTStr += newLine
+          }
+
+          return
+        }
+
+        if (child.nodeType === NodeType.ELEMENT_NODE) {
+          const castedChild = child as HTMLElement
 
           // if they are Meta tags representing title or description add them to the prompt
-          if (
-            childEle.tagName === 'META' &&
-            (Object.hasOwn(childEle.attrs, 'name') || Object.hasOwn(childEle.attrs, 'property'))
-          ) {
-            if (
-              /title|description/gi.test(childEle.attrs.name) ||
-              /title|description/gi.test(childEle.attrs.property)
-            ) {
-              GPTStr += `\n<META> ${childEle.attrs.content}`
+          if (castedChild.tagName === 'META') {
+            const newLine = this.getMetaTagLine(castedChild)
+
+            if (newLine !== null) {
+              GPTStr += newLine
             }
-            // don't parse children it's in the activity, featured, or highlights section
-          } else if (childEle.tagName === 'SECTION') {
-            const h2 = childEle.getElementsByTagName('h2')[0] || null
+            return
+          }
+
+          if (castedChild.tagName === 'SECTION') {
+            const h2 = castedChild.getElementsByTagName('h2')[0] || null
             const hSpan = (h2 && h2.getElementsByTagName('span')[0]) || null
             const sectionName = hSpan && hSpan.structuredText
             if (sectionName && ['highlights', 'featured', 'activity'].includes(sectionName.toLocaleLowerCase())) {
               return
-            } else {
-              traverse(child as HTMLElement, depth + 1)
             }
-          } else if (childEle.tagName === 'DIV' && (childEle.attrs['class'] || '').includes('artdeco-dropdown')) {
-            return
-          } else {
-            traverse(child as HTMLElement, depth + 1)
           }
+
+          if (castedChild.tagName === 'DIV' && (castedChild.attrs['class'] || '').includes('artdeco-dropdown')) {
+            return
+          }
+
+          traverse(child as HTMLElement, depth + 1)
         }
       })
     }

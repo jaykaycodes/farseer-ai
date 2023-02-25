@@ -4,7 +4,7 @@ import { ChevronRightIcon, EditIcon, Trash2Icon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate } from 'react-router-dom'
 
 import { DEFAULT_PROJECT_ID } from '~lib/constants'
-import { getSensibleParser4Host } from '~lib/parsers/factories'
+import { getSensibleParser4Host } from '~lib/parsers/utils'
 import { tw } from '~lib/utils'
 import {
   Q,
