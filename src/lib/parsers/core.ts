@@ -83,8 +83,6 @@ export class OptimisticParser extends Parser {
         if (child.nodeType === NodeType.TEXT_NODE) {
           const newLine = this.getNextLine(child as TextNode)
 
-          console.log(newLine)
-
           if (newLine !== null) {
             GPTStr += newLine
           }
