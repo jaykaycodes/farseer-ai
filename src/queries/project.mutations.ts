@@ -22,6 +22,15 @@ export async function updateProject(project: IProject): Promise<IProject> {
   return project
 }
 
+export async function deleteProject({ projectId }: { projectId: string }): Promise<string> {
+  const projects = await getProjects()
+  const index = projects.findIndex((p) => p.id === projectId)
+  if (index === -1) throw new Error(`Project ${projectId} not found`)
+  projects.splice(index, 1)
+  await storage.set('projects', projects)
+  return projectId
+}
+
 export const useCreateProjectMutation = () => {
   const queryClient = useQueryClient()
 
@@ -39,6 +48,17 @@ export const useUpdateProjectMutation = () => {
   return useMutation(updateProject, {
     onSuccess: (project) => {
       queryClient.setQueryData(Q.project.detail(project.id).queryKey, project)
+      queryClient.invalidateQueries(Q.project.list.queryKey)
+    },
+  })
+}
+
+export const useDeleteProjectMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(deleteProject, {
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries(Q.project.detail(projectId).queryKey)
       queryClient.invalidateQueries(Q.project.list.queryKey)
     },
   })

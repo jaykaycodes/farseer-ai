@@ -1,9 +1,8 @@
 import { createId } from '@paralleldrive/cuid2'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronRightIcon, EditIcon, Trash2Icon } from 'lucide-react'
-import { Link, LoaderFunctionArgs, useNavigate } from 'react-router-dom'
+import { ChevronRightIcon } from 'lucide-react'
+import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
-import { DEFAULT_PROJECT_ID } from '~lib/constants'
 import { getSensibleParser4Host } from '~lib/parsers/factories'
 import { tw } from '~lib/utils'
 import {
@@ -16,11 +15,11 @@ import {
 } from '~queries'
 import { GenerateRequestSchema, IFieldConfig, IGenerateRequest, IOutletConfig, OutletType } from '~schemas'
 
-const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
+const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
-const HomePage = () => {
+const ProjectPage = () => {
   const navigate = useNavigate()
-  const { data: project } = useQuery(projectQuery)
+  const projectId = useParams().projectId!
   const {
     mutateAsync: submitRequest,
     isLoading: isSubmitting,
@@ -28,6 +27,7 @@ const HomePage = () => {
     isError: isSubmitError,
     error: submitError,
   } = useSubmitRequestMutation()
+  const { data: project } = useQuery(projectQuery(projectId))
   const { mutateAsync: createField, isLoading: isCreatingField } = useCreateProjectFieldMutation()
   const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
@@ -50,24 +50,24 @@ const HomePage = () => {
   const handleAddField = async () => {
     const id = createId()
     await createField({
-      projectId: DEFAULT_PROJECT_ID,
+      projectId,
       field: {
         id,
         name: 'field_name',
         hint: 'What should this field contain?',
       },
     })
-    navigate(`/field/${id}`)
+    navigate(`field/${id}`)
   }
 
   const handleDeleteField = async (fieldId: string) => {
-    deleteField({ projectId: DEFAULT_PROJECT_ID, fieldId })
+    deleteField({ projectId, fieldId })
   }
 
   const handleAddOutlet = async () => {
     const id = createId()
     await createOutlet({
-      projectId: DEFAULT_PROJECT_ID,
+      projectId,
       outlet: {
         id,
         type: OutletType.Airtable,
@@ -75,7 +75,7 @@ const HomePage = () => {
         tableId: 'table123',
       },
     })
-    navigate(`/outlet/${id}`)
+    navigate(`outlet/${id}`)
   }
 
   return (
@@ -161,40 +161,20 @@ const HomePage = () => {
   )
 }
 
-export const loader = ({ params: _ }: LoaderFunctionArgs) => {
-  return queryClient.fetchQuery(projectQuery)
+export const loader = ({ params }: LoaderFunctionArgs) => {
+  return queryClient.fetchQuery(projectQuery(params.projectId!))
 }
 
-export default HomePage
+export default ProjectPage
 
 interface FieldListItemProps {
   field: IFieldConfig
   onDelete?: () => void
 }
 
-const _FieldListItemActionBar = ({ field, onDelete }: FieldListItemProps) => (
-  <li className="flex items-center justify-between p-2">
-    <Link to={`/field/${field.id}`}>
-      <h3 className="text-sm font-semibold">{field.name}</h3>
-      <p className="text-xs text-gray-700">{field.hint}</p>
-    </Link>
-
-    <div className="inline-flex gap-x-3">
-      {onDelete && (
-        <button type="button" className="text-error" onClick={onDelete}>
-          <Trash2Icon size="16" />
-        </button>
-      )}
-      <Link to={`/field/${field.id}`}>
-        <EditIcon size="16" />
-      </Link>
-    </div>
-  </li>
-)
-
 const FieldListItem = ({ field }: FieldListItemProps) => (
   <li className="hover:bg-base-200">
-    <Link to={`/field/${field.id}`} className="flex justify-between p-2">
+    <Link to={`field/${field.id}`} className="flex justify-between p-2">
       <div>
         <h3 className="text-sm font-semibold">{field.name}</h3>
         <p className="text-xs text-gray-700">{field.hint}</p>
@@ -213,7 +193,7 @@ interface OutletListItemProps {
 
 const OutletListItem = ({ outlet }: OutletListItemProps) => (
   <li className="hover:bg-base-200">
-    <Link to={`/outlet/${outlet.id}`} className="flex justify-between p-2">
+    <Link to={`outlet/${outlet.id}`} className="flex justify-between p-2">
       <div>
         <h3 className="text-sm font-semibold">{outlet.type}</h3>
       </div>
