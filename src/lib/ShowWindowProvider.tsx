@@ -15,7 +15,6 @@ export function ShowWindowProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     const recvMsg = throttle((msg: unknown) => {
-      console.log(msg)
       if (msg === TOGGLE_PLUGIN_VISIBILITY) setShow((p) => !p)
     }, 50)
 
