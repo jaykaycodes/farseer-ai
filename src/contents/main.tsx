@@ -3,15 +3,16 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import posthog from 'posthog-js'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 
+import AppShell from '~components/AppShell'
 import { ShowWindowProvider, useShowWindow } from '~lib/ShowWindowProvider'
+import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
+import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
+import Layout from '~pages/Layout'
+import OutputPage, { loader as outputLoader } from '~pages/Output'
+import ProjectPage, { loader as projectLoader } from '~pages/Project'
+import ProjectListPage, { loader as projectListLoader } from '~pages/ProjectList'
 import { queryClient } from '~queries'
 import type { IProject } from '~schemas'
-
-import EditFieldPage, { loader as editFieldLoader } from '../pages/EditField'
-import EditOutletPage, { loader as editOutletLoader } from '../pages/EditOutlet'
-import HomePage, { loader as homeLoader } from '../pages/Home'
-import Layout from '../pages/Layout'
-import ProjectPage, { loader as projectLoader } from '../pages/Project'
 
 import cssText from 'data-text:~tailwind.css'
 
@@ -22,8 +23,8 @@ export const router = createMemoryRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
-        loader: homeLoader,
+        element: <ProjectListPage />,
+        loader: projectListLoader,
       },
       {
         path: 'project/:projectId',
@@ -50,6 +51,12 @@ export const router = createMemoryRouter([
       },
     ],
   },
+  // Output renders its own layout
+  {
+    path: 'output',
+    element: <OutputPage />,
+    loader: outputLoader,
+  },
 ])
 
 export const getStyle = () => {
@@ -75,7 +82,9 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <AppShell>
+        <RouterProvider router={router} />
+      </AppShell>
     </QueryClientProvider>
   )
 }

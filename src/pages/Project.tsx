@@ -4,6 +4,7 @@ import { ChevronRightIcon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import { getSensibleParser4Host } from '~lib/parsers/factories'
+import { useOutput } from '~lib/storage'
 import { tw } from '~lib/utils'
 import {
   Q,
@@ -23,7 +24,6 @@ const ProjectPage = () => {
   const {
     mutateAsync: submitRequest,
     isLoading: isSubmitting,
-    data: output,
     isError: isSubmitError,
     error: submitError,
   } = useSubmitRequestMutation()
@@ -31,6 +31,8 @@ const ProjectPage = () => {
   const { mutateAsync: createField, isLoading: isCreatingField } = useCreateProjectFieldMutation()
   const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
+
+  const [output] = useOutput()
 
   const handleSubmit = async () => {
     if (!project) return
@@ -104,7 +106,36 @@ const ProjectPage = () => {
         ))}
       </ul>
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold">Exports</h2>
+        <div>
+          <button
+            disabled={isCreatingOutlet}
+            type="button"
+            className={tw('btn btn-xs btn-link', isCreatingOutlet && 'loading')}
+            onClick={handleAddOutlet}
+          >
+            + Add Export
+          </button>
+        </div>
+      </div>
+
+      <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
+        {project?.outlets.map((outlet) => (
+          <OutletListItem
+            key={outlet.id}
+            outlet={outlet}
+            // onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
+          />
+        ))}
+      </ul>
+
       <div className="mt-3 flex w-full justify-end gap-x-1">
+        {output && (
+          <Link to="/output" className="btn btn-sm btn-outline">
+            Show Output
+          </Link>
+        )}
         <button
           disabled={isSubmitting || !project?.fields.length}
           type="submit"
@@ -116,47 +147,6 @@ const ProjectPage = () => {
       </div>
 
       {isSubmitError && <p className="error text-red-700 ">{submitError as string}</p>}
-
-      {output && (
-        <div className="mt-5">
-          <h3>Output</h3>
-          <div className="h-36 w-full overflow-y-auto rounded-lg border border-dashed border-gray-400 p-2">
-            <pre>{JSON.stringify(JSON.parse(output), null, 2)}</pre>
-          </div>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold">Exports</h2>
-            <div>
-              <button
-                disabled={isCreatingOutlet}
-                type="button"
-                className={tw('btn btn-xs btn-link', isCreatingOutlet && 'loading')}
-                onClick={handleAddOutlet}
-              >
-                + Add Export
-              </button>
-            </div>
-          </div>
-
-          <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
-            {project?.outlets.map((outlet) => (
-              <OutletListItem
-                key={outlet.id}
-                outlet={outlet}
-                // onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
-              />
-            ))}
-          </ul>
-          <div className="mt-2 flex justify-end">
-            <button
-            // disabled={sendingToOutlet}
-            // onClick={async () => await sendToOutlet()}
-            // className={tw('btn btn-sm', sendingToOutlet && 'loading')}
-            >
-              Export
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
