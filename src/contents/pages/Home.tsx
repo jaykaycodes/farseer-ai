@@ -14,14 +14,20 @@ import {
   useDeleteProjectFieldMutation,
   useSubmitRequestMutation,
 } from '~queries'
-import { GenerateRequestSchema, IFieldConfig, IOutletConfig, OutletType } from '~schemas'
+import { GenerateRequestSchema, IFieldConfig, IGenerateRequest, IOutletConfig, OutletType } from '~schemas'
 
 const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
 
 const HomePage = () => {
   const navigate = useNavigate()
   const { data: project } = useQuery(projectQuery)
-  const { mutateAsync: submitRequest, isLoading: isSubmitting, data: output } = useSubmitRequestMutation()
+  const {
+    mutateAsync: submitRequest,
+    isLoading: isSubmitting,
+    data: output,
+    isError: isSubmitError,
+    error: submitError,
+  } = useSubmitRequestMutation()
   const { mutateAsync: createField, isLoading: isCreatingField } = useCreateProjectFieldMutation()
   const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
@@ -33,10 +39,8 @@ const HomePage = () => {
     const parser = getSensibleParser4Host(new URL(window.location.href))
 
     // TODO clean this up - but basically we want to validate the data is filled in before passing to background
-    const data = GenerateRequestSchema.parse({
-      content: parser.doc2Prompt(document),
-      outputFields: project.fields,
-    })
+    const _data: IGenerateRequest = { content: parser.doc2Prompt(document), fields: project.fields }
+    const data = GenerateRequestSchema.parse(_data)
 
     await submitRequest(data)
 
@@ -74,36 +78,6 @@ const HomePage = () => {
     navigate(`/outlet/${id}`)
   }
 
-  // const [sendingToOutlet, setSendingToOutlet] = useState(false)
-
-  // const sendToOutlet = async () => {
-  //   setSendingToOutlet(true)
-  //   const outlet = 'airtable'
-  //   const pageURL = new URL(window.location.href)
-  //   const url = pageURL.href
-
-  //   const res = await sendToBackground<IOutletRequest, IOutletResponse>({
-  //     name: 'send-to-outlet',
-  //     body: {
-  //       outlet,
-  //       url,
-  //       output: JSON.parse(output!),
-  //     },
-  //   })
-
-  //   setSendingToOutlet(false)
-
-  //   if ('error' in res) {
-  //     console.error(res.error)
-  //     return
-  //   } else if ('ok' in res) {
-  //     if (process.env.NODE_ENV === 'development') {
-  //       console.log('Did the record get sent successfully? ')
-  //       console.log(res.ok)
-  //     }
-  //   }
-  // }
-
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -140,6 +114,8 @@ const HomePage = () => {
           Run
         </button>
       </div>
+
+      {isSubmitError && <p className="error text-red-700 ">{submitError as string}</p>}
 
       {output && (
         <div className="mt-5">

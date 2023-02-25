@@ -31,22 +31,29 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
   const outputPrefix = `\n{"${req.body.fields[0].name}":"`
   prompt += outputPrefix
 
-  const response = await openai.createCompletion({
-    model: 'text-davinci-003',
-    prompt,
-    temperature: 0,
-    max_tokens: 820,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-  })
+  try {
+    const response = await openai.createCompletion({
+      model: 'text-davinci-003',
+      prompt,
+      temperature: 0,
+      max_tokens: 2000,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+    })
 
-  const result = `${outputPrefix}${response.completion}`
-  res.send({
-    ok: true,
-    prompt,
-    result,
-  })
+    const result = `${outputPrefix}${response.completion}`
+    res.send({
+      ok: true,
+      prompt,
+      result,
+    })
+  } catch (e) {
+    res.send({
+      ok: false,
+      error: (e as Error).message,
+    })
+  }
 }
 
 export default handler
