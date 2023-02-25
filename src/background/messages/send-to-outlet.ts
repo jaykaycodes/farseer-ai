@@ -9,7 +9,7 @@ const handler: PlasmoMessaging.MessageHandler<IOutletRequest, IOutletResponse> =
   if (!config) throw new Error('Outlet config not found')
   if (!payload) throw new Error('No payload found')
 
-  let outlet: OutletBase
+  let outlet: OutletBase<unknown>
   switch (config.type) {
     case OutletType.Airtable:
       outlet = new outlets.AirtableOutlet(config)

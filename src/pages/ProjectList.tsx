@@ -9,7 +9,7 @@ import type { IProject } from '~schemas'
 
 const projectsQuery = Q.project.list
 
-const HomePage = () => {
+const ProjectListPage = () => {
   const navigate = useNavigate()
   const { data: projects } = useQuery(projectsQuery)
   const { mutateAsync: createProject, isLoading: isCreatingField } = useCreateProjectMutation()
@@ -58,7 +58,7 @@ export const loader = ({ params: _ }: LoaderFunctionArgs) => {
   return queryClient.fetchQuery(projectsQuery)
 }
 
-export default HomePage
+export default ProjectListPage
 
 interface ProjectListItemProps {
   project: IProject
