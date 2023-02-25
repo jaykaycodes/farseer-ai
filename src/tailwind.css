@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
+#plasmo-shadow-container {
   font-family: 'Inter', sans-serif;
   line-height: 1.5;
 }
