@@ -1,7 +1,6 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory'
 import { z } from 'zod'
 
-import { defaultProject } from '~lib/constants'
 import { storage } from '~lib/storage'
 import { IFieldConfig, IOutletConfig, IProject, ProjectSchema } from '~schemas'
 
@@ -34,9 +33,8 @@ export async function getProjects(): Promise<IProject[]> {
     console.error('Invalid projects store:', err)
     // FIXME: we should have better error recovery
     console.log('Resetting store back to default state...')
-    const resetStore = [defaultProject]
-    storage.set('projects', resetStore)
-    return resetStore
+    storage.set('projects', [])
+    return []
   }
 }
 

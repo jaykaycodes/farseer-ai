@@ -1,6 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
 
+import { storage } from '~lib/storage'
 import type { IGenerateRequest, IGenerateResponse } from '~schemas'
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
@@ -15,7 +16,7 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
   }
 
   let prompt = `Given this html:`
-  prompt += `"""\n${req.body.content}\n"""\n`
+  prompt += `"""\n${req.body.content.slice(0, 8000)}\n"""\n`
   prompt += 'Generate JSON with this structure:\n'
   prompt += JSON.stringify(req.body.fields)
   // prompt += `{\n`
@@ -44,7 +45,8 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
       stop: '}',
     })
 
-    const result = `${outputPrefix}${response.completion}}`
+    const result = `${outputPrefix}${response.completion}`
+    storage.set('output', result)
     res.send({
       ok: true,
       prompt,

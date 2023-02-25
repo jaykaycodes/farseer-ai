@@ -1,10 +1,10 @@
 import { createId } from '@paralleldrive/cuid2'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronRightIcon, EditIcon, Trash2Icon } from 'lucide-react'
-import { Link, LoaderFunctionArgs, useNavigate } from 'react-router-dom'
+import { ChevronRightIcon } from 'lucide-react'
+import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
-import { DEFAULT_PROJECT_ID } from '~lib/constants'
 import { getSensibleParser4Host } from '~lib/parsers/utils'
+import { useOutput } from '~lib/storage'
 import { tw } from '~lib/utils'
 import {
   Q,
@@ -16,21 +16,23 @@ import {
 } from '~queries'
 import { GenerateRequestSchema, IFieldConfig, IGenerateRequest, IOutletConfig, OutletType } from '~schemas'
 
-const projectQuery = Q.project.detail(DEFAULT_PROJECT_ID)
+const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
-const HomePage = () => {
+const ProjectPage = () => {
   const navigate = useNavigate()
-  const { data: project } = useQuery(projectQuery)
+  const projectId = useParams().projectId!
   const {
     mutateAsync: submitRequest,
     isLoading: isSubmitting,
-    data: output,
     isError: isSubmitError,
     error: submitError,
   } = useSubmitRequestMutation()
+  const { data: project } = useQuery(projectQuery(projectId))
   const { mutateAsync: createField, isLoading: isCreatingField } = useCreateProjectFieldMutation()
   const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
+
+  const [output] = useOutput()
 
   const handleSubmit = async () => {
     if (!project) return
@@ -50,24 +52,24 @@ const HomePage = () => {
   const handleAddField = async () => {
     const id = createId()
     await createField({
-      projectId: DEFAULT_PROJECT_ID,
+      projectId,
       field: {
         id,
         name: 'field_name',
         hint: 'What should this field contain?',
       },
     })
-    navigate(`/field/${id}`)
+    navigate(`field/${id}`)
   }
 
   const handleDeleteField = async (fieldId: string) => {
-    deleteField({ projectId: DEFAULT_PROJECT_ID, fieldId })
+    deleteField({ projectId, fieldId })
   }
 
   const handleAddOutlet = async () => {
     const id = createId()
     await createOutlet({
-      projectId: DEFAULT_PROJECT_ID,
+      projectId,
       outlet: {
         id,
         type: OutletType.Airtable,
@@ -75,7 +77,7 @@ const HomePage = () => {
         tableId: 'table123',
       },
     })
-    navigate(`/outlet/${id}`)
+    navigate(`outlet/${id}`)
   }
 
   return (
@@ -104,7 +106,36 @@ const HomePage = () => {
         ))}
       </ul>
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold">Exports</h2>
+        <div>
+          <button
+            disabled={isCreatingOutlet}
+            type="button"
+            className={tw('btn btn-xs btn-link', isCreatingOutlet && 'loading')}
+            onClick={handleAddOutlet}
+          >
+            + Add Export
+          </button>
+        </div>
+      </div>
+
+      <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
+        {project?.outlets.map((outlet) => (
+          <OutletListItem
+            key={outlet.id}
+            outlet={outlet}
+            // onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
+          />
+        ))}
+      </ul>
+
       <div className="mt-3 flex w-full justify-end gap-x-1">
+        {output && (
+          <Link to="/output" className="btn btn-sm btn-outline">
+            Show Output
+          </Link>
+        )}
         <button
           disabled={isSubmitting || !project?.fields.length}
           type="submit"
@@ -116,85 +147,24 @@ const HomePage = () => {
       </div>
 
       {isSubmitError && <p className="error text-red-700 ">{submitError as string}</p>}
-
-      {output && (
-        <div className="mt-5">
-          <h3>Output</h3>
-          <div className="h-36 w-full overflow-y-auto rounded-lg border border-dashed border-gray-400 p-2">
-            <pre>{JSON.stringify(JSON.parse(output), null, 2)}</pre>
-          </div>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold">Exports</h2>
-            <div>
-              <button
-                disabled={isCreatingOutlet}
-                type="button"
-                className={tw('btn btn-xs btn-link', isCreatingOutlet && 'loading')}
-                onClick={handleAddOutlet}
-              >
-                + Add Export
-              </button>
-            </div>
-          </div>
-
-          <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
-            {project?.outlets.map((outlet) => (
-              <OutletListItem
-                key={outlet.id}
-                outlet={outlet}
-                // onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
-              />
-            ))}
-          </ul>
-          <div className="mt-2 flex justify-end">
-            <button
-            // disabled={sendingToOutlet}
-            // onClick={async () => await sendToOutlet()}
-            // className={tw('btn btn-sm', sendingToOutlet && 'loading')}
-            >
-              Export
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
 
-export const loader = ({ params: _ }: LoaderFunctionArgs) => {
-  return queryClient.fetchQuery(projectQuery)
+export const loader = ({ params }: LoaderFunctionArgs) => {
+  return queryClient.fetchQuery(projectQuery(params.projectId!))
 }
 
-export default HomePage
+export default ProjectPage
 
 interface FieldListItemProps {
   field: IFieldConfig
   onDelete?: () => void
 }
 
-const _FieldListItemActionBar = ({ field, onDelete }: FieldListItemProps) => (
-  <li className="flex items-center justify-between p-2">
-    <Link to={`/field/${field.id}`}>
-      <h3 className="text-sm font-semibold">{field.name}</h3>
-      <p className="text-xs text-gray-700">{field.hint}</p>
-    </Link>
-
-    <div className="inline-flex gap-x-3">
-      {onDelete && (
-        <button type="button" className="text-error" onClick={onDelete}>
-          <Trash2Icon size="16" />
-        </button>
-      )}
-      <Link to={`/field/${field.id}`}>
-        <EditIcon size="16" />
-      </Link>
-    </div>
-  </li>
-)
-
 const FieldListItem = ({ field }: FieldListItemProps) => (
   <li className="hover:bg-base-200">
-    <Link to={`/field/${field.id}`} className="flex justify-between p-2">
+    <Link to={`field/${field.id}`} className="flex justify-between p-2">
       <div>
         <h3 className="text-sm font-semibold">{field.name}</h3>
         <p className="text-xs text-gray-700">{field.hint}</p>
@@ -213,7 +183,7 @@ interface OutletListItemProps {
 
 const OutletListItem = ({ outlet }: OutletListItemProps) => (
   <li className="hover:bg-base-200">
-    <Link to={`/outlet/${outlet.id}`} className="flex justify-between p-2">
+    <Link to={`outlet/${outlet.id}`} className="flex justify-between p-2">
       <div>
         <h3 className="text-sm font-semibold">{outlet.type}</h3>
       </div>
