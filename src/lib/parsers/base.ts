@@ -59,9 +59,14 @@ export abstract class Parser {
     }
 
     if (parent.tagName === 'SPAN') {
-      const parentsParent = parent.parentNode
+      let parentsParent = parent.parentNode
+      let loopCount = 0
+      while (parentsParent !== null && parentsParent.tagName === 'SPAN' && loopCount < 10) {
+        loopCount++
+        parentsParent = parentsParent.parentNode
+      }
 
-      if (parentsParent === null) {
+      if (parentsParent === null || parentsParent.tagName === 'SPAN') {
         return childContent
       } else {
         return `\n<${parentsParent.tagName.toLocaleLowerCase()}> ${childContent}`
@@ -80,7 +85,7 @@ export abstract class Parser {
 
   protected getMetaTagLine(node: HTMLElement): string | null {
     if (Object.hasOwn(node.attrs, 'name')) {
-      if (!/title|description/gi.test(node.attrs.name)) {
+      if (!/title|description/gi.test(node.attrs.name) || node.attrs.content.trim() === '') {
         return null
       }
 
@@ -88,10 +93,10 @@ export abstract class Parser {
     }
 
     if (Object.hasOwn(node.attrs, 'property')) {
-      if (!/title|description/gi.test(node.attrs.property)) {
+      if (!/title|description/gi.test(node.attrs.property) || node.attrs.content.trim() === '') {
         return null
       }
-
+      console.log('property', JSON.stringify(node.attrs))
       return `\n<meta> ${node.attrs.content}`
     }
 

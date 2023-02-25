@@ -31,7 +31,7 @@ export class OptimisticParser extends Parser {
       return content
     }
 
-    // if fails, try to get the content element
+    // if fails, try to get the main class elements
     const mainClassHTMLCollection = document.getElementsByClassName('main')
     if (mainClassHTMLCollection.length > 0) {
       let idx = 0
@@ -42,7 +42,7 @@ export class OptimisticParser extends Parser {
       return content
     }
 
-    // if fails, try to get the content element
+    // if fails, try to get the main id element
     const mainIdHTMLCollection = document.getElementById('main')
     if (mainIdHTMLCollection !== null) {
       return mainIdHTMLCollection.outerHTML
