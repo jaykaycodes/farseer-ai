@@ -39,7 +39,7 @@ const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
             return (
               <SelectField key={field.id} label="Data Type" {...register(`refinements.${index}.rule`)}>
                 <option value="">No Preference</option>
-                <option value={`This should be a number, e.g. "value"`}>Number, e.g. 1</option>
+                <option value={`This should be a number, e.g. 1`}>Number, e.g. 1</option>
                 <option value={`This should be a string, e.g. "value"`}>String, e.g. "value"</option>
                 <option value={`This should be an array of numbers, e.g. [1,2]`}>List of Numbers, e.g. [1, 2]</option>
                 <option value={`This should be an array of strings, e.g. ["first","second"]`}>
