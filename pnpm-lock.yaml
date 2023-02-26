@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@headlessui/react': ^1.7.12
   '@hookform/resolvers': ^2.9.11
   '@lukemorales/query-key-factory': ^1.1.0
   '@paralleldrive/cuid2': ^2.2.0
@@ -49,6 +50,7 @@ specifiers:
   zod: ^3.20.6
 
 dependencies:
+  '@headlessui/react': 1.7.12_biqbaboplfbrettd7655fr4n2y
   '@hookform/resolvers': 2.9.11_react-hook-form@7.43.1
   '@lukemorales/query-key-factory': 1.1.0_buahgomyr64jaa7ifqnsppsgky
   '@paralleldrive/cuid2': 2.2.0
@@ -765,6 +767,18 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       cross-spawn: 7.0.3
+    dev: false
+
+  /@headlessui/react/1.7.12_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-FhSx5V+Qp0GvbTpaxyS+ymGDDNntCacClWsk/d8Upbr19g3AsPbjfPk4+m2CgJGcuCB5Dz7LpUIOAbvQTyjL2g==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+      react-dom: ^16 || ^17 || ^18
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@hookform/resolvers/2.9.11_react-hook-form@7.43.1:
@@ -3123,6 +3137,10 @@ packages:
   /cli-width/4.0.0:
     resolution: {integrity: sha512-ZksGS2xpa/bYkNzN3BAw1wEjsLV/ZKOf/CCrJ/QOBsxx6fOARIkwTutxp1XIOIohi6HKmOFjMoK/XaqDVUpEEw==}
     engines: {node: '>= 12'}
+    dev: false
+
+  /client-only/0.0.1:
+    resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
     dev: false
 
   /clone/1.0.4:

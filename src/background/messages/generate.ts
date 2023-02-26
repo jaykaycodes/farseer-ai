@@ -20,9 +20,12 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
 
   const promptInstructionObjs = req.body.fields
     .map((field) => {
-      // const refinements = field.refinements ? `, refinements: "${field.refinements.join('. ')}"}"` : ''
-      // return `{ key: "${field.name}", hint: "${field.hint}"${refinements} }`
-      return `{ key: "${field.name}", hint: "${field.hint}" }`
+      let refinements = ''
+      const filteredRefinements = field.refinements.filter((refinement) => refinement.rule != '')
+      if (filteredRefinements.length > 0) {
+        refinements = `, refinements: "${field.refinements.map(({ rule }) => rule).join('. ')}"`
+      }
+      return `{ key: "${field.name}", hint: "${field.hint}"${refinements} }`
     })
     .join('\n')
 

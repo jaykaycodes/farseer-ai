@@ -26,6 +26,7 @@ export const FieldConfigSchema = z.object({
   id: z.string(),
   name: z.string(),
   hint: z.string(),
+  refinements: z.array(z.object({ rule: z.string() })),
 })
 export type IFieldConfig = z.infer<typeof FieldConfigSchema>
 

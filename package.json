@@ -12,6 +12,7 @@
     "invoke": "node -r esbuild-runner/register --"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.12",
     "@hookform/resolvers": "^2.9.11",
     "@lukemorales/query-key-factory": "^1.1.0",
     "@paralleldrive/cuid2": "^2.2.0",

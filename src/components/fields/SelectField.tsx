@@ -1,13 +1,15 @@
-import { forwardRef, HTMLProps, useId } from 'react'
+import { forwardRef, HTMLProps, ReactNode, useId } from 'react'
 
 import { tw } from '~lib/utils'
 
 import type { StandardFieldProps } from './utils'
 
-export interface TextAreaFieldProps extends HTMLProps<HTMLTextAreaElement>, StandardFieldProps {}
+export interface SelectFieldProps extends HTMLProps<HTMLSelectElement>, StandardFieldProps {
+  children: ReactNode
+}
 
-const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
-  ({ label, error, wrapperClassName, labelClassName, errorClassName, ...props }, ref) => {
+const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
+  ({ label, error, wrapperClassName, labelClassName, errorClassName, children, ...props }, ref) => {
     const _id = useId()
     const id = props.id || _id
 
@@ -19,12 +21,14 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           </label>
         )}
 
-        <textarea
+        <select
           {...props}
           id={id}
           ref={ref}
-          className={tw('textarea textarea-bordered', props.className, error && 'textarea-error')}
-        />
+          className={tw('select select-bordered font-normal', props.className, error && 'input-error')}
+        >
+          {children}
+        </select>
 
         {error && (
           <label htmlFor={id} className="label">
@@ -36,4 +40,4 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   },
 )
 
-export default TextAreaField
+export default SelectField
