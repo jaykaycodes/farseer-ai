@@ -1,1 +1,2 @@
 export const TOGGLE_PLUGIN_VISIBILITY = 'TOGGLE_PLUGIN_VISIBILITY'
+export const RESULT_STORAGE_KEY = 'result'

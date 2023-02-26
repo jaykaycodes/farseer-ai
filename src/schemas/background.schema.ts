@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { FieldConfigSchema, OutletConfigSchema as OutletConfigSchema } from './project.schema'
+import { ResultSchema } from './result.schema'
 
 /**
  * Extends FieldConfigSchema to require a name and hint.
@@ -16,6 +17,7 @@ export const RequiredFieldConfigSchema = FieldConfigSchema.extend({
 export const GenerateRequestSchema = z.object({
   fields: z.array(RequiredFieldConfigSchema),
   content: z.string(),
+  __skip_open_ai__: z.boolean().optional(),
 })
 export type IGenerateRequest = z.infer<typeof GenerateRequestSchema>
 
@@ -27,7 +29,7 @@ export const GenerateResponseSchema = z.discriminatedUnion('ok', [
   z.object({
     ok: z.literal(true),
     prompt: z.string(),
-    result: z.string(),
+    result: ResultSchema,
   }),
 ])
 export type IGenerateResponse = z.infer<typeof GenerateResponseSchema>
