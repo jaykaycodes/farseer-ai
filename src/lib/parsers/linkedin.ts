@@ -7,7 +7,7 @@ export class LinkedProfileParser extends Parser {
     return /\/in\/[a-zA-Z0-9-]*(\/)?$/gi.test(url.pathname) && url.host.endsWith('linkedin.com')
   }
 
-  _doc2Prompt(document: Document): string {
+  _doc2Html4Prompt(document: Document): string {
     let content = ''
 
     // Gets the Head element of the DOM

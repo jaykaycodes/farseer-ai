@@ -4,8 +4,8 @@ import type { HTMLElement, TextNode } from 'node-html-parser'
 import { HTMLTagAllowList } from '~lib/parsers/utils'
 
 export abstract class Parser {
-  doc2Prompt(document: Document): string {
-    return this._doc2Prompt(document).slice(0, 20000).trim()
+  doc2Html4Prompt(document: Document): string {
+    return this._doc2Html4Prompt(document).trim()
   }
 
   protected encodedLastAppenedLine: string | null = null
@@ -96,14 +96,13 @@ export abstract class Parser {
       if (!/title|description/gi.test(node.attrs.property) || node.attrs.content.trim() === '') {
         return null
       }
-      console.log('property', JSON.stringify(node.attrs))
       return `\n<meta> ${node.attrs.content}`
     }
 
     return null
   }
 
-  _doc2Prompt(_document: Document): string {
+  _doc2Html4Prompt(_document: Document): string {
     throw new Error('Not implemented')
   }
 }

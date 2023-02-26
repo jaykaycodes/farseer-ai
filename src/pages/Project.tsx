@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
-import { getSensibleParser4Host } from '~lib/parsers/utils'
+import { getSensibleParser4URL } from '~lib/parsers/utils'
 import { useOutput } from '~lib/storage'
 import { tw } from '~lib/utils'
 import {
@@ -38,10 +38,13 @@ const ProjectPage = () => {
     if (!project) return
 
     // store parser manual override for project
-    const parser = getSensibleParser4Host(new URL(window.location.href))
+    const parser = getSensibleParser4URL(new URL(window.location.href))
+    const html4Prompt = parser.doc2Html4Prompt(document)
+
+    if (process.env.NODE_ENV === 'development') console.log(html4Prompt)
 
     // TODO clean this up - but basically we want to validate the data is filled in before passing to background
-    const _data: IGenerateRequest = { content: parser.doc2Prompt(document), fields: project.fields }
+    const _data: IGenerateRequest = { content: html4Prompt, fields: project.fields }
     const data = GenerateRequestSchema.parse(_data)
 
     await submitRequest(data)
@@ -57,6 +60,7 @@ const ProjectPage = () => {
         id,
         name: 'field_name',
         hint: 'What should this field contain?',
+        refinements: [{ rule: '' }],
       },
     })
     navigate(`field/${id}`)

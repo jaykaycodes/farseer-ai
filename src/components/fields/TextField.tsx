@@ -1,17 +1,13 @@
-import { forwardRef, HTMLProps, useId } from 'react'
+import { forwardRef, useId } from 'react'
 
 import { tw } from '~lib/utils'
 
-export interface InputFieldProps extends HTMLProps<HTMLInputElement> {
-  label?: string
-  error?: string
-  wrapperClassName?: string
-  labelClassName?: string
-  errorClassName?: string
-}
+import type { BaseFieldProps } from './types'
+
+export interface InputFieldProps extends BaseFieldProps {}
 
 const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, error, wrapperClassName, labelClassName, errorClassName, ...props }, ref) => {
+  ({ label, error, wrapperClassName, labelClassName, errorClassName, altLabel1, altLabel2, ...props }, ref) => {
     const _id = useId()
     const id = props.id || _id
 
@@ -19,7 +15,8 @@ const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
       <div className={tw('form-control w-full', wrapperClassName)}>
         {label && (
           <label htmlFor={id} className="label">
-            <span className={tw('label-text', labelClassName)}>{label}</span>
+            {label && <span className={tw('label-text', labelClassName)}>{label}</span>}
+            {altLabel1 && <span className={tw('label-text-alt')}>{altLabel1}</span>}
           </label>
         )}
 
@@ -31,11 +28,10 @@ const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
           className={tw('input input-bordered', props.className, error && 'input-error')}
         />
 
-        {error && (
-          <label htmlFor={id} className="label">
-            <span className={tw('label-text-alt text-error', errorClassName)}>{error}</span>
-          </label>
-        )}
+        <label htmlFor={id} className="label">
+          {error && <span className={tw('label-text-alt text-error', errorClassName)}>{error}</span>}
+          {altLabel2 && <span className={tw('label-text-alt')}>{altLabel2}</span>}
+        </label>
       </div>
     )
   },
