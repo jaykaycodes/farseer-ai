@@ -16,7 +16,9 @@ import { FieldConfigSchema, IFieldConfig } from '~schemas'
 const fieldQuery = (projectId: string, fieldId: string) => Q.project.detail(projectId)._ctx.field(fieldId)
 
 const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
-  const { register, control } = useFormContext()
+  const { register, control, getValues } = useFormContext()
+  const projectId = useParams().projectId!
+  const { mutate } = useUpdateProjectFieldMutation()
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -52,13 +54,17 @@ const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
           return (
             <TextField
               key={field.id}
-              removeFromFieldArray={() => remove(index)}
+              removeFromFieldArray={() => {
+                remove(index)
+                const field = getValues() as IFieldConfig
+                mutate({ projectId, field })
+              }}
               label={`Refinment ${index}`}
               {...register(`refinements.${index}.rule`)}
             />
           )
         })}
-        <button type="button" className="mt-4 w-fit underline opacity-60" onClick={() => append({ rule: '' })}>
+        <button type="button" className="ml-2 mt-4 w-fit underline opacity-60" onClick={() => append({ rule: '' })}>
           + Add Refinement
         </button>
       </Transition>
@@ -87,14 +93,13 @@ const EditFieldPage = () => {
     navigate('..')
   }
 
+  const saveForm = form.handleSubmit((field: IFieldConfig) => {
+    mutate({ projectId, field })
+  })
+
   return (
     <FormProvider {...form}>
-      <form
-        onBlur={form.handleSubmit((field: IFieldConfig) => {
-          mutate({ projectId, field })
-        })}
-        className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}
-      >
+      <form onBlur={saveForm} className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}>
         <TextField
           label="Field name"
           error={form.formState.errors.name?.message}
