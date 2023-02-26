@@ -4,14 +4,8 @@ import type { HTMLElement, TextNode } from 'node-html-parser'
 import { HTMLTagAllowList } from '~lib/parsers/utils'
 
 export abstract class Parser {
-  protected static htmlCharacterLimit = 14000
-  doc2Html4Prompt(document: Document): { html4Prompt: string; isTruncated: boolean } {
-    const parsedHTML = this._doc2Html4Prompt(document)
-
-    return {
-      html4Prompt: parsedHTML.slice(0, Parser.htmlCharacterLimit).trim(),
-      isTruncated: parsedHTML.length > Parser.htmlCharacterLimit,
-    }
+  doc2Html4Prompt(document: Document): string {
+    return this._doc2Html4Prompt(document).trim()
   }
 
   protected encodedLastAppenedLine: string | null = null
@@ -102,7 +96,6 @@ export abstract class Parser {
       if (!/title|description/gi.test(node.attrs.property) || node.attrs.content.trim() === '') {
         return null
       }
-      console.log('property', JSON.stringify(node.attrs))
       return `\n<meta> ${node.attrs.content}`
     }
 

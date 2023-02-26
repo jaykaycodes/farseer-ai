@@ -39,7 +39,9 @@ const ProjectPage = () => {
 
     // store parser manual override for project
     const parser = getSensibleParser4URL(new URL(window.location.href))
-    const { html4Prompt } = parser.doc2Html4Prompt(document)
+    const html4Prompt = parser.doc2Html4Prompt(document)
+
+    if (process.env.NODE_ENV === 'development') console.log(html4Prompt)
 
     // TODO clean this up - but basically we want to validate the data is filled in before passing to background
     const _data: IGenerateRequest = { content: html4Prompt, fields: project.fields }
