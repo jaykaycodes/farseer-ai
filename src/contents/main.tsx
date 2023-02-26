@@ -7,60 +7,54 @@ import AppShell from '~components/AppShell'
 import { ShowWindowProvider, useShowWindow } from '~lib/ShowWindowProvider'
 import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
 import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
-import Layout from '~pages/Layout'
+import Layout, { loader as layoutLoader } from '~pages/Layout'
 import ProjectPage, { loader as projectLoader } from '~pages/Project'
-import ProjectListPage, { loader as projectListLoader } from '~pages/ProjectList'
 import ResultsPage, { loader as resultsLoader } from '~pages/Results'
 import { queryClient } from '~queries'
-import type { IProject } from '~schemas'
 
 import cssText from 'data-text:~tailwind.css'
 
-export const router = createMemoryRouter(
-  [
-    {
-      path: '/',
-      element: <Layout />,
-      children: [
-        {
-          index: true,
-          element: <ProjectListPage />,
-          loader: projectListLoader,
-        },
-        {
-          path: 'project/:projectId',
-          loader: projectLoader,
-          handle: {
-            projectName: (data: IProject) => data.name,
+export const router = createMemoryRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    loader: layoutLoader,
+    children: [
+      {
+        path: ':projectId',
+        children: [
+          {
+            index: true,
+            element: <ProjectPage />,
+            loader: projectLoader,
           },
-          children: [
-            {
-              index: true,
-              element: <ProjectPage />,
+          {
+            path: 'field/:fieldId',
+            element: <EditFieldPage />,
+            loader: editFieldLoader,
+            handle: {
+              title: 'Edit Field',
             },
-            {
-              path: 'field/:fieldId',
-              element: <EditFieldPage />,
-              loader: editFieldLoader,
+          },
+          {
+            path: 'outlet/:outletId',
+            element: <EditOutletPage />,
+            loader: editOutletLoader,
+            handle: {
+              title: 'Edit Outlet',
             },
-            {
-              path: 'outlet/:outletId',
-              element: <EditOutletPage />,
-              loader: editOutletLoader,
-            },
-          ],
-        },
-      ],
-    },
-    // Output renders its own layout
-    {
-      path: 'results',
-      element: <ResultsPage />,
-      loader: resultsLoader,
-    },
-  ],
-  {},
-)
+          },
+        ],
+      },
+    ],
+  },
+  // Results renders its own layout
+  {
+    path: 'output',
+    element: <ResultsPage />,
+    loader: resultsLoader,
+  },
+])
 
 export const getStyle = () => {
   const style = document.createElement('style')

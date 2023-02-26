@@ -58,7 +58,7 @@ export const useDeleteProjectMutation = () => {
 
   return useMutation(deleteProject, {
     onSuccess: (projectId) => {
-      queryClient.invalidateQueries(Q.project.detail(projectId).queryKey)
+      queryClient.setQueryData(Q.project.detail(projectId).queryKey, undefined)
       queryClient.invalidateQueries(Q.project.list.queryKey)
     },
   })

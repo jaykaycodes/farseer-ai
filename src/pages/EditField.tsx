@@ -6,7 +6,7 @@ import { Trash2Icon } from 'lucide-react'
 import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
-import SelectField from '~components/fields/SelectField'
+import NativeSelectField from '~components/fields/NativeSelectField'
 import TextAreaField from '~components/fields/TextAreaField'
 import TextField from '~components/fields/TextField'
 import { tw } from '~lib/utils'
@@ -39,7 +39,7 @@ const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
         {fields.map((field, index) => {
           if (index === 0) {
             return (
-              <SelectField key={field.id} label="Data Type" {...register(`refinements.${index}.rule`)}>
+              <NativeSelectField key={field.id} label="Data Type" {...register(`refinements.${index}.rule`)}>
                 <option value="">No Preference</option>
                 <option value={`This should be a number, e.g. 1`}>Number, e.g. 1</option>
                 <option value={`This should be a string, e.g. "value"`}>String, e.g. "value"</option>
@@ -47,7 +47,7 @@ const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
                 <option value={`This should be an array of strings, e.g. ["first","second"]`}>
                   List of Strings, e.g. ["valOne", "valTwo"]
                 </option>
-              </SelectField>
+              </NativeSelectField>
             )
           }
 
