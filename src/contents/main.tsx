@@ -8,56 +8,59 @@ import { ShowWindowProvider, useShowWindow } from '~lib/ShowWindowProvider'
 import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
 import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
 import Layout from '~pages/Layout'
-import OutputPage, { loader as outputLoader } from '~pages/Output'
 import ProjectPage, { loader as projectLoader } from '~pages/Project'
 import ProjectListPage, { loader as projectListLoader } from '~pages/ProjectList'
+import ResultsPage, { loader as resultsLoader } from '~pages/Results'
 import { queryClient } from '~queries'
 import type { IProject } from '~schemas'
 
 import cssText from 'data-text:~tailwind.css'
 
-export const router = createMemoryRouter([
-  {
-    path: '/',
-    element: <Layout />,
-    children: [
-      {
-        index: true,
-        element: <ProjectListPage />,
-        loader: projectListLoader,
-      },
-      {
-        path: 'project/:projectId',
-        loader: projectLoader,
-        handle: {
-          projectName: (data: IProject) => data.name,
+export const router = createMemoryRouter(
+  [
+    {
+      path: '/',
+      element: <Layout />,
+      children: [
+        {
+          index: true,
+          element: <ProjectListPage />,
+          loader: projectListLoader,
         },
-        children: [
-          {
-            index: true,
-            element: <ProjectPage />,
+        {
+          path: 'project/:projectId',
+          loader: projectLoader,
+          handle: {
+            projectName: (data: IProject) => data.name,
           },
-          {
-            path: 'field/:fieldId',
-            element: <EditFieldPage />,
-            loader: editFieldLoader,
-          },
-          {
-            path: 'outlet/:outletId',
-            element: <EditOutletPage />,
-            loader: editOutletLoader,
-          },
-        ],
-      },
-    ],
-  },
-  // Output renders its own layout
-  {
-    path: 'output',
-    element: <OutputPage />,
-    loader: outputLoader,
-  },
-])
+          children: [
+            {
+              index: true,
+              element: <ProjectPage />,
+            },
+            {
+              path: 'field/:fieldId',
+              element: <EditFieldPage />,
+              loader: editFieldLoader,
+            },
+            {
+              path: 'outlet/:outletId',
+              element: <EditOutletPage />,
+              loader: editOutletLoader,
+            },
+          ],
+        },
+      ],
+    },
+    // Output renders its own layout
+    {
+      path: 'results',
+      element: <ResultsPage />,
+      loader: resultsLoader,
+    },
+  ],
+  {},
+)
 
 export const getStyle = () => {
   const style = document.createElement('style')
@@ -94,3 +97,10 @@ export default () => (
     <App />
   </ShowWindowProvider>
 )
+// @ts-expect-error - module.hot should exist
+if (module.hot) {
+  // @ts-expect-error - module.hot should exist
+  module.hot.accept('./main', () => {
+    console.log('here')
+  })
+}

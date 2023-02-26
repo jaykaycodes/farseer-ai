@@ -1,11 +1,12 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
 
-import { storage } from '~lib/storage'
-import type { IGenerateRequest, IGenerateResponse } from '~schemas'
+import type { IGenerateRequest, IGenerateResponse, IResult } from '~schemas'
+
+const HTML_CHAR_LIMIT = 10000
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
-const HtmlCharacterLimit = 10000
+const fakeRawResult = '{ "name": "John Doe", "age": 43, "city": "New York" }'
 
 const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateResponse> = async (req, res) => {
   if (!req.body || req.body.content.length === 0) {
@@ -16,7 +17,7 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
     return
   }
 
-  const willTruncate = req.body.content.length > HtmlCharacterLimit
+  const willTruncate = req.body.content.length > HTML_CHAR_LIMIT
 
   const promptInstructionObjs = req.body.fields
     .map((field) => {
@@ -38,29 +39,33 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
 ${promptInstructionObjs}
 
 Note: This html does not have closing tags.${willTruncate ? ' This html has been truncated.' : ''}\n`
-  prompt += `"""html\n${req.body.content.slice(0, HtmlCharacterLimit)}\n"""\n`
+  prompt += `"""html\n${req.body.content.slice(0, HTML_CHAR_LIMIT)}\n"""\n`
 
   // Need to add a prefix but also add it to our output
-  const outputPrefix = `\n{"${req.body.fields[0].name}":`
-  prompt += outputPrefix
+  const resultPrefix = `\n{"${req.body.fields[0].name}":`
+  prompt += resultPrefix
 
   try {
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      temperature: 0,
-      max_tokens: 800,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-      logit_bias: { '8423': 6 },
-      stop: '}',
-    })
+    let rawResult: string
+    if (req.body.__skip_open_ai__) {
+      rawResult = fakeRawResult
+    } else {
+      const response = await openai.createCompletion({
+        model: 'text-davinci-003',
+        prompt,
+        temperature: 0,
+        max_tokens: 800,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        logit_bias: { '8423': 6 },
+        stop: '}',
+      })
 
-    // add the closing bracket, since stop sequence ensures it's not included
-    const result = `${outputPrefix}${response.completion} }`
+      rawResult = resultPrefix + response.completion + '}' // the stop token isn't included, so append a final }
+    }
 
-    storage.set('output', result)
+    const result = parseResult(rawResult)
 
     res.send({
       ok: true,
@@ -76,3 +81,18 @@ Note: This html does not have closing tags.${willTruncate ? ' This html has been
 }
 
 export default handler
+
+function parseResult(result: string): IResult {
+  try {
+    // Try to parse the response as JSON right away
+    return JSON.parse(result)
+  } catch (e) {
+    // Didn't work? time to do some cleanup
+    const cleaned = result.trim().replace('{{', '{').replace('}}', '}')
+    const extracted = cleaned.match(/({.*})/)?.[1]
+    if (extracted) return JSON.parse(extracted)
+
+    console.warn(`Could not extract JSON from result`, result)
+    return null
+  }
+}

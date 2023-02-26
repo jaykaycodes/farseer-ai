@@ -1,10 +1,11 @@
 import { createId } from '@paralleldrive/cuid2'
+import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
+import { RESULT_STORAGE_KEY } from '~lib/constants'
 import { getSensibleParser4URL } from '~lib/parsers/utils'
-import { useOutput } from '~lib/storage'
 import { tw } from '~lib/utils'
 import {
   Q,
@@ -32,9 +33,9 @@ const ProjectPage = () => {
   const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
 
-  const [output] = useOutput()
+  const [result] = useStorage(RESULT_STORAGE_KEY)
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.MouseEvent) => {
     if (!project) return
 
     // store parser manual override for project
@@ -44,12 +45,15 @@ const ProjectPage = () => {
     if (process.env.NODE_ENV === 'development') console.log(html4Prompt)
 
     // TODO clean this up - but basically we want to validate the data is filled in before passing to background
-    const _data: IGenerateRequest = { content: html4Prompt, fields: project.fields }
+    const _data: IGenerateRequest = {
+      content: html4Prompt,
+      fields: project.fields,
+      __skip_open_ai__: process.env.NODE_ENV === 'development' && e.shiftKey,
+    }
     const data = GenerateRequestSchema.parse(_data)
 
-    await submitRequest(data)
-
-    // TODO: add output to execution history & navigate to it
+    submitRequest(data)
+    navigate('/results')
   }
 
   const handleAddField = async () => {
@@ -135,9 +139,9 @@ const ProjectPage = () => {
       </ul>
 
       <div className="mt-3 flex w-full justify-end gap-x-1">
-        {output && (
-          <Link to="/output" className="btn btn-sm btn-outline">
-            Show Output
+        {result && (
+          <Link to="/results" className="btn btn-sm btn-outline">
+            Show Results
           </Link>
         )}
         <button
