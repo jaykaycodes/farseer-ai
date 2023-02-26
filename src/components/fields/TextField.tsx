@@ -1,27 +1,31 @@
 import { forwardRef, HTMLProps, useId } from 'react'
+import { Trash2Icon } from 'lucide-react'
 
 import { tw } from '~lib/utils'
 
-export interface InputFieldProps extends HTMLProps<HTMLInputElement> {
-  label?: string
-  error?: string
-  wrapperClassName?: string
-  labelClassName?: string
-  errorClassName?: string
-}
+import type { StandardFieldProps } from './utils'
+
+export interface InputFieldProps extends HTMLProps<HTMLInputElement>, StandardFieldProps {}
 
 const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, error, wrapperClassName, labelClassName, errorClassName, ...props }, ref) => {
+  ({ label, error, wrapperClassName, labelClassName, errorClassName, removeFromFieldArray, ...props }, ref) => {
     const _id = useId()
     const id = props.id || _id
 
     return (
       <div className={tw('form-control w-full', wrapperClassName)}>
-        {label && (
-          <label htmlFor={id} className="label">
-            <span className={tw('label-text', labelClassName)}>{label}</span>
-          </label>
-        )}
+        <div className="flex justify-between">
+          {label && (
+            <label htmlFor={id} className="label">
+              <span className={tw('label-text', labelClassName)}>{label}</span>
+            </label>
+          )}
+          {removeFromFieldArray && (
+            <button type="button" className="mr-4" onClick={removeFromFieldArray}>
+              <Trash2Icon size={12} />
+            </button>
+          )}
+        </div>
 
         <input
           type="text"

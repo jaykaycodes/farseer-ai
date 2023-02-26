@@ -60,6 +60,7 @@ const ProjectPage = () => {
         id,
         name: 'field_name',
         hint: 'What should this field contain?',
+        refinements: [{ rule: '' }],
       },
     })
     navigate(`field/${id}`)

@@ -1,9 +1,12 @@
+import { useState } from 'react'
+import { Transition } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { Trash2Icon } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
+import SelectField from '~components/fields/SelectField'
 import TextAreaField from '~components/fields/TextAreaField'
 import TextField from '~components/fields/TextField'
 import { tw } from '~lib/utils'
@@ -12,6 +15,57 @@ import { FieldConfigSchema, IFieldConfig } from '~schemas'
 
 const fieldQuery = (projectId: string, fieldId: string) => Q.project.detail(projectId)._ctx.field(fieldId)
 
+const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
+  const { register, control } = useFormContext()
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'refinements',
+  })
+
+  return (
+    <>
+      <Transition
+        show={showing}
+        enter=" transform ease-out duration-100"
+        enterFrom=" transform opacity-0"
+        enterTo=" transform opacity-100"
+        leave=" transform ease-out duration-100"
+        leaveFrom=" transform opacity-100"
+        leaveTo=" transform opacity-0"
+      >
+        {fields.map((field, index) => {
+          if (index === 0) {
+            return (
+              <SelectField key={field.id} label="Data Type" {...register(`refinements.${index}.rule`)}>
+                <option value="">No Preference</option>
+                <option value={`This should be a number, e.g. "value"`}>Number, e.g. 1</option>
+                <option value={`This should be a string, e.g. "value"`}>String, e.g. "value"</option>
+                <option value={`This should be an array of numbers, e.g. [1,2]`}>List of Numbers, e.g. [1, 2]</option>
+                <option value={`This should be an array of strings, e.g. ["first","second"]`}>
+                  List of Strings, e.g. ["valOne", "valTwo"]
+                </option>
+              </SelectField>
+            )
+          }
+
+          return (
+            <TextField
+              key={field.id}
+              removeFromFieldArray={() => remove(index)}
+              label={`Refinment ${index}`}
+              {...register(`refinements.${index}.rule`)}
+            />
+          )
+        })}
+        <button type="button" className="mt-4 w-fit underline opacity-60" onClick={() => append({ rule: '' })}>
+          + Add Refinement
+        </button>
+      </Transition>
+    </>
+  )
+}
+
 const EditFieldPage = () => {
   const projectId = useParams().projectId!
   const fieldId = useParams().fieldId!
@@ -19,11 +73,13 @@ const EditFieldPage = () => {
 
   const { data } = useQuery(fieldQuery(projectId, fieldId))
   const { mutate } = useUpdateProjectFieldMutation()
-  const { register, handleSubmit, formState } = useForm({
+  const form = useForm({
     resolver: zodResolver(FieldConfigSchema),
     values: data,
     mode: 'onBlur',
   })
+
+  const [showingAdvanced, setShowingAdvanced] = useState(false)
 
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
   const handleDeleteField = async () => {
@@ -32,37 +88,48 @@ const EditFieldPage = () => {
   }
 
   return (
-    <form
-      onBlur={handleSubmit((field: IFieldConfig) => {
-        mutate({ projectId, field })
-      })}
-      className={tw('mt-3 space-y-2', formState.isSubmitting && 'disabled')}
-    >
-      <TextField
-        label="Field name"
-        error={formState.errors.name?.message}
-        placeholder="field_name"
-        autoComplete="off"
-        {...register('name')}
-      />
+    <FormProvider {...form}>
+      <form
+        onBlur={form.handleSubmit((field: IFieldConfig) => {
+          mutate({ projectId, field })
+        })}
+        className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}
+      >
+        <TextField
+          label="Field name"
+          error={form.formState.errors.name?.message}
+          placeholder="field_name"
+          autoComplete="off"
+          {...form.register('name')}
+        />
 
-      <TextAreaField
-        label="Field hint"
-        error={formState.errors.hint?.message}
-        placeholder="What should this field contain?"
-        {...register('hint')}
-      />
+        <TextAreaField
+          label="Field hint"
+          error={form.formState.errors.hint?.message}
+          placeholder="What should this field contain?"
+          {...form.register('hint')}
+        />
 
-      <div className="flex w-full items-center justify-end">
-        <button
-          type="button"
-          className="btn btn-error btn-outline btn-sm flex items-center gap-x-1"
-          onClick={handleDeleteField}
-        >
-          <Trash2Icon size={12} /> Delete
-        </button>
-      </div>
-    </form>
+        <AdvancedFieldSettings showing={showingAdvanced} />
+
+        <div className="flex w-full items-center justify-end space-x-4">
+          <button
+            type="button"
+            className="cursor-pointer underline opacity-60"
+            onClick={() => setShowingAdvanced(!showingAdvanced)}
+          >
+            Advanced
+          </button>
+          <button
+            type="button"
+            className="btn btn-error btn-outline btn-sm flex items-center gap-x-1"
+            onClick={handleDeleteField}
+          >
+            <Trash2Icon size={12} /> Delete
+          </button>
+        </div>
+      </form>
+    </FormProvider>
   )
 }
 

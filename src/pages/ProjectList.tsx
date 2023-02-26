@@ -21,6 +21,7 @@ const ProjectListPage = () => {
       name: 'My Project',
       fields: [],
       outlets: [],
+      // refinements: {},
     })
     navigate(`/project/${id}`)
   }

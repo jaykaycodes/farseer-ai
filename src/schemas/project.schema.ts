@@ -26,6 +26,7 @@ export const FieldConfigSchema = z.object({
   id: z.string(),
   name: z.string(),
   hint: z.string(),
+  refinements: z.array(z.object({ rule: z.string() })),
 })
 export type IFieldConfig = z.infer<typeof FieldConfigSchema>
 
@@ -34,5 +35,9 @@ export const ProjectSchema = z.object({
   name: z.string().min(1),
   fields: z.array(FieldConfigSchema),
   outlets: z.array(OutletConfigSchema),
+  // refinements: z.object({
+  //   // Technically this can be -100 to 100, but we'd only really use -15 to 15
+  //   nullSensitivity: z.number().min(-100).max(100).optional(),
+  // }),
 })
 export type IProject = z.infer<typeof ProjectSchema>
