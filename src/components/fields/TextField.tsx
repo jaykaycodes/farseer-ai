@@ -24,11 +24,11 @@ const TextField = forwardRef<HTMLInputElement, InputFieldProps>(
         )}
 
         <input
+          type="text"
+          {...props}
           id={id}
           ref={ref}
-          type="text"
           className={tw('input input-bordered', props.className, error && 'input-error')}
-          {...props}
         />
 
         {error && (

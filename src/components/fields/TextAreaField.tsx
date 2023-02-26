@@ -24,10 +24,10 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
         )}
 
         <textarea
+          {...props}
           id={id}
           ref={ref}
           className={tw('textarea textarea-bordered', props.className, error && 'textarea-error')}
-          {...props}
         />
 
         {error && (
