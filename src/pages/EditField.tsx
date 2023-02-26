@@ -51,16 +51,24 @@ const AdvancedFieldSettings = ({ showing }: { showing: boolean }) => {
             )
           }
 
+          const handleDelete = () => {
+            remove(index)
+            const field = getValues() as IFieldConfig
+            mutate({ projectId, field })
+          }
+
+          const altLabel = (
+            <button type="button" className="mr-4" onClick={handleDelete}>
+              <Trash2Icon size={12} />
+            </button>
+          )
+
           return (
             <TextField
               key={field.id}
-              removeFromFieldArray={() => {
-                remove(index)
-                const field = getValues() as IFieldConfig
-                mutate({ projectId, field })
-              }}
               label={`Refinment ${index}`}
               {...register(`refinements.${index}.rule`)}
+              altLabel1={altLabel}
             />
           )
         })}

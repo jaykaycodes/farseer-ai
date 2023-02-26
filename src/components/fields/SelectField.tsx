@@ -1,10 +1,10 @@
-import { forwardRef, HTMLProps, ReactNode, useId } from 'react'
+import { forwardRef, ReactNode, useId } from 'react'
 
 import { tw } from '~lib/utils'
 
-import type { StandardFieldProps } from './utils'
+import type { BaseFieldProps } from './types'
 
-export interface SelectFieldProps extends HTMLProps<HTMLSelectElement>, StandardFieldProps {
+export interface SelectFieldProps extends BaseFieldProps<HTMLSelectElement> {
   children: ReactNode
 }
 

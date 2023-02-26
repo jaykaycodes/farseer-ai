@@ -1,10 +1,10 @@
-import { forwardRef, HTMLProps, useId } from 'react'
+import { forwardRef, useId } from 'react'
 
 import { tw } from '~lib/utils'
 
-import type { StandardFieldProps } from './utils'
+import type { BaseFieldProps } from './types'
 
-export interface TextAreaFieldProps extends HTMLProps<HTMLTextAreaElement>, StandardFieldProps {}
+export interface TextAreaFieldProps extends BaseFieldProps<HTMLTextAreaElement> {}
 
 const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
   ({ label, error, wrapperClassName, labelClassName, errorClassName, ...props }, ref) => {
