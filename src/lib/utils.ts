@@ -1,12 +1,15 @@
 import { createId } from '@paralleldrive/cuid2'
 import { twMerge } from 'tailwind-merge'
 
-import type { IProject } from '~schemas'
+import type { IFieldConfig, IProject } from '~schemas'
 
 export const tw = twMerge
 
 type BootstrapStrategy = 'pdp' | 'linkedin' | 'raw'
 export type BootstrappedProject = { strategy: BootstrapStrategy } & Partial<IProject>
+
+const baseProject: () => Omit<IProject, 'name' | 'fields'> = () => ({ id: createId(), outlets: [] })
+const baseField: () => Omit<IFieldConfig, 'name' | 'hint'> = () => ({ id: createId(), refinements: [{ rule: '' }] })
 
 export const bootstrapProject = (bootstrappedProject: BootstrappedProject): IProject => {
   const { strategy, ...overrides } = bootstrappedProject
@@ -14,59 +17,53 @@ export const bootstrapProject = (bootstrappedProject: BootstrappedProject): IPro
   switch (strategy) {
     case 'linkedin':
       return {
-        id: createId(),
+        ...baseProject(),
         fields: [
-          { id: createId(), name: 'name', hint: 'name the main person in this profile', refinements: [{ rule: '' }] },
+          { ...baseField(), name: 'name', hint: 'name the main person in this profile' },
           {
-            id: createId(),
+            ...baseField(),
             name: 'companies',
             hint: "list the company of this person's job",
             refinements: [{ rule: 'This should be an array of strings, e.g. ["first","second"]' }],
           },
           {
-            id: createId(),
+            ...baseField(),
             name: 'industry',
             hint: 'name the industry this person works in.',
-            refinements: [{ rule: '' }],
           },
         ],
         name: 'LinkedIn Profile Collector',
-        outlets: [],
         ...overrides,
       }
     case 'pdp':
       return {
-        id: createId(),
+        ...baseProject(),
         fields: [
           {
-            id: createId(),
+            ...baseField(),
             name: 'product',
             hint: 'name the primary product on this page',
-            refinements: [{ rule: '' }],
           },
           {
-            id: createId(),
+            ...baseField(),
             name: 'price',
             hint: 'get the price of this product',
-            refinements: [{ rule: '' }],
           },
           {
-            id: createId(),
+            ...baseField(),
             name: 'other_products',
             hint: 'list the non-primary products on this page',
             refinements: [{ rule: 'This should be an array of numbers, e.g. [1,2]' }],
           },
         ],
         name: 'Product Page Collector',
-        outlets: [],
         ...overrides,
       }
     default:
       return {
-        id: createId(),
+        ...baseProject(),
         fields: [],
         name: 'Untitled Project',
-        outlets: [],
         ...overrides,
       }
   }
