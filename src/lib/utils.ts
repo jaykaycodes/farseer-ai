@@ -5,7 +5,7 @@ import type { IFieldConfig, IProject } from '~schemas'
 
 export const tw = twMerge
 
-type BootstrapStrategy = 'pdp' | 'linkedin' | 'raw'
+type BootstrapStrategy = 'pdp' | 'linkedin' | 'article' | 'raw'
 export type BootstrappedProject = { strategy: BootstrapStrategy } & Partial<IProject>
 
 const baseProject: () => Omit<IProject, 'name' | 'fields'> = () => ({ id: createId(), outlets: [] })
@@ -57,6 +57,29 @@ export const bootstrapProject = (bootstrappedProject: BootstrappedProject): IPro
           },
         ],
         name: 'Product Page Collector',
+        ...overrides,
+      }
+    case 'article':
+      return {
+        ...baseProject(),
+        fields: [
+          {
+            ...baseField(),
+            name: 'author',
+            hint: 'name the author of this article',
+          },
+          {
+            ...baseField(),
+            name: 'title',
+            hint: 'get the title of this article',
+          },
+          {
+            ...baseField(),
+            name: 'summary',
+            hint: 'get the summary of this article',
+          },
+        ],
+        name: 'Article Page Collector',
         ...overrides,
       }
     default:

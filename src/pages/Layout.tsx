@@ -101,6 +101,7 @@ const Layout = () => {
                   const projects = await resetAllProjects([
                     { strategy: 'pdp' },
                     { strategy: 'linkedin' },
+                    { strategy: 'article' },
                     { strategy: 'raw' },
                   ])
                   navigate(`/${projects[0].id}` ?? '/')
