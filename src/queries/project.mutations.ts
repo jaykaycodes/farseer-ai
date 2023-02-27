@@ -23,9 +23,9 @@ export const useResetProjectsMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation(resetProjects, {
-    onSuccess: (projects) => {
-      projects.forEach((p) => queryClient.setQueryData(Q.project.detail(p.id).queryKey, p))
-      queryClient.invalidateQueries(Q.project.list.queryKey)
+    onSuccess: () => {
+      // Invalidate all project realted queries
+      queryClient.invalidateQueries(Q.project._def)
     },
   })
 }
