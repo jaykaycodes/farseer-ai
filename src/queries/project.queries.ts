@@ -2,8 +2,9 @@ import { createQueryKeys } from '@lukemorales/query-key-factory'
 import { Storage } from '@plasmohq/storage'
 import { z } from 'zod'
 
-import { makeDefaultProject } from '~lib/utils'
 import { IFieldConfig, IOutletConfig, IProject, ProjectSchema } from '~schemas'
+
+import { resetProjects } from './project.mutations'
 
 const storage = new Storage()
 
@@ -28,17 +29,11 @@ export const projectQueries = createQueryKeys('project', {
   }),
 })
 
-const resetProjects = () => {
-  const projects = [makeDefaultProject()]
-  storage.set('projects', projects)
-  return projects
-}
-
 export async function getProjects(): Promise<IProject[]> {
   let projects = await storage.get<IProject[]>('projects')
 
   if (!projects || !Array.isArray(projects) || projects.length === 0) {
-    projects = resetProjects()
+    projects = await resetProjects()
   }
 
   try {

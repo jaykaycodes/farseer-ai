@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { createId } from '@paralleldrive/cuid2'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronLeftIcon, FilePlus2Icon, Trash2Icon, XIcon } from 'lucide-react'
+import { ChevronLeftIcon, FilePlus2Icon, Redo2, Trash2Icon, XIcon } from 'lucide-react'
 import {
   Link,
   LoaderFunctionArgs,
@@ -16,7 +16,7 @@ import {
 import { SelectList } from '~components/fields/SelectField'
 import { useShowWindow } from '~lib/ShowWindowProvider'
 import { tw } from '~lib/utils'
-import { Q, queryClient, useCreateProjectMutation, useDeleteProjectMutation } from '~queries'
+import { Q, queryClient, useCreateProjectMutation, useDeleteProjectMutation, useResetProjectsMutation } from '~queries'
 
 const assertHandle = (handle: unknown): handle is Record<string, unknown> => Boolean(handle)
 const projectsQuery = Q.project.list
@@ -40,6 +40,8 @@ const Layout = () => {
     })
     navigate(`/${projectId}`)
   }
+
+  const { mutateAsync: resetAllProjects } = useResetProjectsMutation()
 
   const { mutateAsync: deleteProject } = useDeleteProjectMutation()
   const handleDeleteProject = async () => {
@@ -88,6 +90,23 @@ const Layout = () => {
                 onClick={handleDeleteProject}
               >
                 <Trash2Icon size={16} />
+              </button>
+            )}
+            {process.env.NODE_ENV === 'development' && (
+              <button
+                type="button"
+                className={tw('tooltip tooltip-bottom', isCreatingProject && 'loading')}
+                data-tip="Reset Project"
+                onClick={async () => {
+                  const projects = await resetAllProjects([
+                    { strategy: 'pdp' },
+                    { strategy: 'linkedin' },
+                    { strategy: 'raw' },
+                  ])
+                  navigate(`/${projects[0].id}` ?? '/')
+                }}
+              >
+                <Redo2 size={16} />
               </button>
             )}
           </div>
