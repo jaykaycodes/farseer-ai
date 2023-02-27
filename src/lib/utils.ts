@@ -55,6 +55,12 @@ export const bootstrapProject = (bootstrappedProject: BootstrappedProject): IPro
             hint: 'list the non-primary products on this page',
             refinements: [{ rule: 'This should be an array of numbers, e.g. [1,2]' }],
           },
+          {
+            ...baseField(),
+            name: 'ingredients',
+            hint: 'list the ingredients of this product',
+            refinements: [{ rule: 'This should be an array of strings, e.g. ["first","second"]' }],
+          },
         ],
         name: 'Product Page Collector',
         ...overrides,
