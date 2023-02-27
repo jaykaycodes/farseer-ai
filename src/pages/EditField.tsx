@@ -9,9 +9,16 @@ import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 import NativeSelectField from '~components/fields/NativeSelectField'
 import TextAreaField from '~components/fields/TextAreaField'
 import TextField from '~components/fields/TextField'
+import { getSensibleParser4URL } from '~lib/parsers/utils'
 import { tw } from '~lib/utils'
-import { Q, queryClient, useDeleteProjectFieldMutation, useUpdateProjectFieldMutation } from '~queries'
-import { FieldConfigSchema, IFieldConfig } from '~schemas'
+import {
+  Q,
+  queryClient,
+  useDeleteProjectFieldMutation,
+  useSimpleSubmitRequestMutation,
+  useUpdateProjectFieldMutation,
+} from '~queries'
+import { FieldConfigSchema, GenerateRequestSchema, IFieldConfig, IGenerateRequest } from '~schemas'
 
 const fieldQuery = (projectId: string, fieldId: string) => Q.project.detail(projectId)._ctx.field(fieldId)
 
@@ -104,6 +111,33 @@ const EditFieldPage = () => {
   const saveForm = form.handleSubmit((field: IFieldConfig) => {
     mutate({ projectId, field })
   })
+  const {
+    mutateAsync: submitRequest,
+    isLoading: isSubmitting,
+    isError: isSubmitError,
+    error: submitError,
+  } = useSimpleSubmitRequestMutation()
+
+  const [result, setResult] = useState<string | null>(null)
+
+  const handleTestRun = async (e: React.MouseEvent) => {
+    // store parser manual override for project
+    const parser = getSensibleParser4URL(new URL(window.location.href))
+    const html4Prompt = parser.doc2Html4Prompt(document)
+
+    if (process.env.NODE_ENV === 'development') console.log(html4Prompt)
+
+    // TODO clean this up - but basically we want to validate the data is filled in before passing to background
+    const _data: IGenerateRequest = {
+      content: html4Prompt,
+      fields: [form.getValues()],
+      __skip_open_ai__: process.env.NODE_ENV === 'development' && e.shiftKey,
+    }
+    const data = GenerateRequestSchema.parse(_data)
+
+    const result = await submitRequest(data)
+    setResult(JSON.stringify(result))
+  }
 
   return (
     <FormProvider {...form}>
@@ -125,6 +159,8 @@ const EditFieldPage = () => {
 
         <AdvancedFieldSettings showing={showingAdvanced} />
 
+        {result && <pre>{result}</pre>}
+
         <div className="flex w-full items-center justify-end space-x-4">
           <button
             type="button"
@@ -139,6 +175,9 @@ const EditFieldPage = () => {
             onClick={handleDeleteField}
           >
             <Trash2Icon size={12} /> Delete
+          </button>
+          <button type="button" className="btn btn-outline btn-sm flex items-center gap-x-1" onClick={handleTestRun}>
+            Run
           </button>
         </div>
       </form>

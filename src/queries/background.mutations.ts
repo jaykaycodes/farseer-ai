@@ -25,6 +25,10 @@ async function submitRequest(body: IGenerateRequest): Promise<IResult> {
   throw res.error
 }
 
+export const useSimpleSubmitRequestMutation = () => {
+  return useMutation(submitRequest)
+}
+
 export const SUBMIT_REQUEST_MUTATION_KEY = ['submitRequest']
 export const useSubmitRequestMutation = () => {
   const [_, setStore] = useStorage<IResult>(RESULT_STORAGE_KEY, null)
