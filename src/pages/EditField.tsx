@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { Trash2Icon } from 'lucide-react'
+import { Trash2Icon, XIcon } from 'lucide-react'
 import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
@@ -101,6 +101,7 @@ const EditFieldPage = () => {
   })
 
   const [showingAdvanced, setShowingAdvanced] = useState(false)
+  const [showingTestResult, setShowingTestResult] = useState(false)
 
   const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
   const handleDeleteField = async () => {
@@ -111,14 +112,15 @@ const EditFieldPage = () => {
   const saveForm = form.handleSubmit((field: IFieldConfig) => {
     mutate({ projectId, field })
   })
+
   const {
     mutateAsync: submitRequest,
     isLoading: isSubmitting,
+    data: submitResult,
+    isSuccess: isSubmitSuccess,
     isError: isSubmitError,
     error: submitError,
   } = useSimpleSubmitRequestMutation()
-
-  const [result, setResult] = useState<string | null>(null)
 
   const handleTestRun = async (e: React.MouseEvent) => {
     // store parser manual override for project
@@ -135,53 +137,79 @@ const EditFieldPage = () => {
     }
     const data = GenerateRequestSchema.parse(_data)
 
-    const result = await submitRequest(data)
-    setResult(JSON.stringify(result))
+    submitRequest(data)
+    setShowingTestResult(true)
   }
 
   return (
-    <FormProvider {...form}>
-      <form onBlur={saveForm} className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}>
-        <TextField
-          label="Field name"
-          error={form.formState.errors.name?.message}
-          placeholder="field_name"
-          autoComplete="off"
-          {...form.register('name')}
-        />
+    <div className="-mb-3">
+      <FormProvider {...form}>
+        <form onBlur={saveForm} className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}>
+          <TextField
+            label="Field name"
+            error={form.formState.errors.name?.message}
+            placeholder="field_name"
+            autoComplete="off"
+            {...form.register('name')}
+          />
 
-        <TextAreaField
-          label="Field hint"
-          error={form.formState.errors.hint?.message}
-          placeholder="What should this field contain?"
-          {...form.register('hint')}
-        />
+          <TextAreaField
+            label="Field hint"
+            error={form.formState.errors.hint?.message}
+            placeholder="What should this field contain?"
+            {...form.register('hint')}
+          />
+          <AdvancedFieldSettings showing={showingAdvanced} />
 
-        <AdvancedFieldSettings showing={showingAdvanced} />
+          <div className="bg-base-100 sticky bottom-0 w-full">
+            <Transition
+              show={showingTestResult}
+              enter=" transform ease-out duration-100"
+              enterFrom=" transform opacity-0"
+              enterTo=" transform opacity-100"
+              leave=" transform ease-out duration-100"
+              leaveFrom=" transform opacity-100"
+            >
+              <div className="flex items-center justify-end py-2">
+                <button type="button" onClick={() => setShowingTestResult(!showingTestResult)}>
+                  <XIcon size={12} />
+                </button>
+              </div>
+              <div className="dashed  max-h-24 overflow-y-auto rounded-md border p-2">
+                {isSubmitting && <div className="text-center">Submitting...</div>}
+                {isSubmitError && <pre>{JSON.stringify(submitError)}</pre>}
+                {isSubmitSuccess && <code className={'JSON'}>{JSON.stringify(submitResult, null, 2)}</code>}
+              </div>
+            </Transition>
 
-        {result && <pre>{result}</pre>}
-
-        <div className="flex w-full items-center justify-end space-x-4">
-          <button
-            type="button"
-            className="cursor-pointer underline opacity-60"
-            onClick={() => setShowingAdvanced(!showingAdvanced)}
-          >
-            Advanced
-          </button>
-          <button
-            type="button"
-            className="btn btn-error btn-outline btn-sm flex items-center gap-x-1"
-            onClick={handleDeleteField}
-          >
-            <Trash2Icon size={12} /> Delete
-          </button>
-          <button type="button" className="btn btn-outline btn-sm flex items-center gap-x-1" onClick={handleTestRun}>
-            Run
-          </button>
-        </div>
-      </form>
-    </FormProvider>
+            <div className="flex items-center justify-end space-x-2 py-2">
+              <button
+                type="button"
+                className="cursor-pointer px-2 underline opacity-60"
+                onClick={() => setShowingAdvanced(!showingAdvanced)}
+              >
+                {showingAdvanced ? 'Hide' : 'Advanced'}
+              </button>
+              <button
+                type="button"
+                className="btn btn-error btn-outline btn-sm flex items-center gap-x-1"
+                onClick={handleDeleteField}
+              >
+                <Trash2Icon size={12} /> Delete
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm flex items-center gap-x-1"
+                disabled={isSubmitting}
+                onClick={handleTestRun}
+              >
+                Test
+              </button>
+            </div>
+          </div>
+        </form>
+      </FormProvider>
+    </div>
   )
 }
 
