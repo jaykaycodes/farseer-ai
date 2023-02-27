@@ -50,7 +50,7 @@ export const router = createMemoryRouter([
   },
   // Results renders its own layout
   {
-    path: 'output',
+    path: 'results',
     element: <ResultsPage />,
     loader: resultsLoader,
   },
