@@ -1,8 +1,11 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory'
+import { Storage } from '@plasmohq/storage'
 import { z } from 'zod'
 
-import { storage } from '~lib/storage'
+import { makeDefaultProject } from '~lib/utils'
 import { IFieldConfig, IOutletConfig, IProject, ProjectSchema } from '~schemas'
+
+const storage = new Storage()
 
 export const projectQueries = createQueryKeys('project', {
   list: {
@@ -25,16 +28,26 @@ export const projectQueries = createQueryKeys('project', {
   }),
 })
 
+const resetProjects = () => {
+  const projects = [makeDefaultProject()]
+  storage.set('projects', projects)
+  return projects
+}
+
 export async function getProjects(): Promise<IProject[]> {
-  const store = (await storage.get('projects')) ?? []
+  let projects = await storage.get<IProject[]>('projects')
+
+  if (!projects || !Array.isArray(projects) || projects.length === 0) {
+    projects = resetProjects()
+  }
+
   try {
-    return z.array(ProjectSchema).parse(store)
+    return z.array(ProjectSchema).parse(projects)
   } catch (err) {
     console.error('Invalid projects store:', err)
     // FIXME: we should have better error recovery
     console.log('Resetting store back to default state...')
-    storage.set('projects', [])
-    return []
+    return resetProjects()
   }
 }
 

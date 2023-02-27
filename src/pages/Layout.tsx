@@ -136,9 +136,8 @@ export default Layout
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const projects = await queryClient.fetchQuery(projectsQuery)
-  if (!projects) {
-    // TODO create default project?
-  } else if (!params.projectId) {
+
+  if (!params.projectId) {
     // TODO load last project id from storage
     console.log('redirecting to', projects[0].id)
     return redirect(`/${projects[0].id}`)

@@ -1,10 +1,12 @@
+import { Storage } from '@plasmohq/storage'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { storage } from '~lib/storage'
 import type { IFieldConfig, IOutletConfig, IProject } from '~schemas'
 
 import Q from './_queries'
 import { getProject, getProjects } from './project.queries'
+
+const storage = new Storage()
 
 async function createProject(project: IProject): Promise<IProject> {
   const projects = await getProjects()
