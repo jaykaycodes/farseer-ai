@@ -1,10 +1,15 @@
 import type { Parser } from './base'
 import { OptimisticParser } from './core'
 import { LinkedProfileParser } from './linkedin'
+import { ZillowHomeDetailParser, ZillowSearchParser } from './zillow'
 
 export function getSensibleParser4URL(url: URL): Parser {
   if (LinkedProfileParser.isSensible(url)) {
     return new LinkedProfileParser()
+  } else if (ZillowHomeDetailParser.isSensible(url)) {
+    return new ZillowHomeDetailParser()
+  } else if (ZillowSearchParser.isSensible(url)) {
+    return new ZillowSearchParser()
   } else {
     return new OptimisticParser()
   }
