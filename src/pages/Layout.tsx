@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronLeftIcon, FilePlus2Icon, Maximize2Icon, Minimize2Icon, RecycleIcon, XIcon } from 'lucide-react'
 import {
@@ -23,7 +24,7 @@ const projectsQuery = Q.project.list
 
 const Layout = () => {
   const { setShow } = useShowWindow()
-  const [minimized, setMinimized] = useState(false)
+  const [minimized, setMinimized] = useStorage('minimized', false)
   const navigate = useNavigate()
 
   const { data: projects } = useQuery(projectsQuery)
