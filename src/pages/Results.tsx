@@ -16,8 +16,6 @@ const ResultsPage = () => {
   const isMutating = 1 === useIsMutating({ mutationKey: SUBMIT_REQUEST_MUTATION_KEY, exact: true })
   const [result] = useStorage<IResult>(RESULT_STORAGE_KEY, {})
 
-  // @jake didn't know whether to make an outlets query, or just use the project query.  Went with the latter.
-  // Any opinions?
   const projectId = useParams().projectId!
   const { data: project } = useQuery(projectQuery(projectId))
   const outlets = useMemo(() => project?.outlets.map((o) => o), [project])
