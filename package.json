@@ -65,6 +65,16 @@
   "manifest": {
     "host_permissions": [
       "https://*/*"
+    ],
+    "web_accessible_resources": [
+      {
+        "matches": [
+          "<all_urls>"
+        ],
+        "resources": [
+          "*"
+        ]
+      }
     ]
   }
 }

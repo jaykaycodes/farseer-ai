@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronLeftIcon, FilePlus2Icon, RecycleIcon, XIcon } from 'lucide-react'
+import { ChevronLeftIcon, FilePlus2Icon, RecycleIcon } from 'lucide-react'
 import {
   Link,
   LoaderFunctionArgs,
@@ -13,7 +13,6 @@ import {
 } from 'react-router-dom'
 
 import { SelectList } from '~components/fields/SelectField'
-import { useShowWindow } from '~lib/ShowWindowProvider'
 import { makeExampleProject, tw } from '~lib/utils'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import { Q, queryClient, resetProjects, useCreateProjectMutation, useResetProjectsMutation } from '~queries'
@@ -25,7 +24,6 @@ const Layout = () => {
   const navigate = useNavigate()
   const { data: projects } = useQuery(projectsQuery)
   const projectId = useParams().projectId!
-  const { setShow } = useShowWindow()
   const matches = useMatches()
   const rootMatch = useMatch('/:projectId')
 
@@ -45,11 +43,7 @@ const Layout = () => {
     navigate(`/${prj.id}`)
   }
 
-  const left = rootMatch ? (
-    <h1 className="font-bold">
-      <span className="text-sm">🔮</span> Farseer
-    </h1>
-  ) : (
+  const left = rootMatch ? null : (
     <Link to={`/${projectId}`} className="inline-flex items-center gap-x-1 text-sm">
       <ChevronLeftIcon size={12} /> Back
     </Link>
@@ -94,7 +88,7 @@ const Layout = () => {
 
   return (
     <>
-      <div className="flex h-10 items-center border-b border-gray-300 p-2">
+      <div className="flex h-10 items-center border-b border-gray-200 p-2">
         {/* Left */}
         <div className="inline-flex h-full w-1/2 select-none items-center justify-start">{left}</div>
 
@@ -102,17 +96,7 @@ const Layout = () => {
         <div className="inline-flex h-full shrink-0 items-center">{middle}</div>
 
         {/* Right */}
-        <div className="inline-flex h-full w-1/2 items-center justify-end">
-          <button
-            type="button"
-            className="flex items-center focus:outline-offset-0"
-            onClick={() => {
-              setShow(false)
-            }}
-          >
-            <XIcon size={18} />
-          </button>
-        </div>
+        <div className="inline-flex h-full w-1/2 items-center justify-end"></div>
       </div>
 
       <div className="p-3">
