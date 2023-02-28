@@ -5,7 +5,6 @@ export function useIsKeypressed(initialKey: string) {
 
   function downHandler({ key }: KeyboardEvent) {
     if (key === initialKey) {
-      console.log(key)
       setPressed(true)
     }
   }

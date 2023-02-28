@@ -3,8 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import posthog from 'posthog-js'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 
-import AppShell from '~components/AppShell'
-import { ShowWindowProvider, useShowWindow } from '~lib/ShowWindowProvider'
+import { APP_WINDOW_DIMS } from '~lib/constants'
 import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
 import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
 import Layout, { loader as layoutLoader } from '~pages/Layout'
@@ -12,14 +11,7 @@ import ProjectPage, { loader as projectLoader } from '~pages/Project'
 import ResultsPage, { loader as resultsLoader } from '~pages/Results'
 import { queryClient } from '~queries'
 
-import cssReset from 'data-text:~reset.css'
-import cssTailwind from 'data-text:~tailwind.css'
-
-export const getStyle = () => {
-  const style = document.createElement('style')
-  style.textContent = cssReset + cssTailwind
-  return style
-}
+import '~tailwind.css'
 
 export const router = createMemoryRouter([
   {
@@ -64,8 +56,6 @@ export const router = createMemoryRouter([
 ])
 
 const App = () => {
-  const { show } = useShowWindow()
-
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
       // services to set up on initial show
@@ -76,26 +66,13 @@ const App = () => {
     }
   }, [])
 
-  if (!show) return null
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell>
+      <div style={{ ...APP_WINDOW_DIMS }} className="flex flex-col overflow-auto">
         <RouterProvider router={router} />
-      </AppShell>
+      </div>
     </QueryClientProvider>
   )
 }
 
-export default () => (
-  <ShowWindowProvider>
-    <App />
-  </ShowWindowProvider>
-)
-// @ts-expect-error - module.hot should exist
-if (module.hot) {
-  // @ts-expect-error - module.hot should exist
-  module.hot.accept('./main', () => {
-    console.log('here')
-  })
-}
+export default App
