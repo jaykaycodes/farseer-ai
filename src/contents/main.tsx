@@ -12,7 +12,14 @@ import ProjectPage, { loader as projectLoader } from '~pages/Project'
 import ResultsPage, { loader as resultsLoader } from '~pages/Results'
 import { queryClient } from '~queries'
 
-import cssText from 'data-text:~tailwind.css'
+import cssReset from 'data-text:~reset.css'
+import cssTailwind from 'data-text:~tailwind.css'
+
+export const getStyle = () => {
+  const style = document.createElement('style')
+  style.textContent = cssReset + cssTailwind
+  return style
+}
 
 export const router = createMemoryRouter([
   {
@@ -55,12 +62,6 @@ export const router = createMemoryRouter([
     loader: resultsLoader,
   },
 ])
-
-export const getStyle = () => {
-  const style = document.createElement('style')
-  style.textContent = cssText
-  return style
-}
 
 const App = () => {
   const { show } = useShowWindow()

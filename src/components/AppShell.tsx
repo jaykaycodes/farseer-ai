@@ -11,6 +11,8 @@ const AppShell = ({ children }: Props) => {
 
   return (
     <div
+      id="app-shell"
+      role="dialog"
       data-theme="emerald"
       className="fixed top-4 right-4 rounded-md bg-black/20 p-1 font-sans text-gray-900 shadow"
       style={{ transform: `translate(${x}px,${y}px)` }}

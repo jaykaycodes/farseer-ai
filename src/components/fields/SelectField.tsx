@@ -71,6 +71,7 @@ interface SelectListProps {
   value?: SelectOption
   wrapperClassName?: string
   inputClassName?: string
+  optionsWrapperClassName?: string
 }
 
 export const SelectList = ({
@@ -81,18 +82,26 @@ export const SelectList = ({
   onChange,
   wrapperClassName,
   inputClassName,
+  optionsWrapperClassName,
 }: SelectListProps) => (
   <div className={tw('relative', wrapperClassName)}>
     <Listbox disabled={disabled} value={value} onChange={onChange}>
       <Listbox.Button className={tw('input-bordered input bg-base-100 w-full text-left', inputClassName)}>
-        <span className="text-ellipsis font-bold leading-tight">{label ?? value?.label}</span>
+        <span className="block w-full overflow-hidden text-ellipsis whitespace-nowrap pr-5 font-bold leading-tight">
+          {label ?? value?.label}
+        </span>
         <span className="pointer-events-none absolute inset-y-0 right-1 flex items-center rounded-r-md px-2">
           <ChevronDownIcon size={16} className="text-gray-400" aria-hidden="true" />
         </span>
       </Listbox.Button>
 
       <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
-        <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+        <Listbox.Options
+          className={tw(
+            'absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none',
+            optionsWrapperClassName,
+          )}
+        >
           {options.map((o) => (
             <SelectListItem key={o.id ?? o.value} option={o} />
           ))}
@@ -111,14 +120,14 @@ const SelectListItem = ({ option }: SelectListItemProps) => (
     value={option}
     className={({ active }) =>
       tw(
-        'relative cursor-default select-none py-2 px-4',
+        'relative cursor-default select-none py-2 px-4 text-inherit',
         active ? 'bg-primary text-primary-content' : 'text-base-content',
       )
     }
   >
     {({ active, selected }) => (
       <>
-        <span className={tw('inline-block break-words bg-transparent', selected && 'font-semibold')}>
+        <span className={tw('inline-block break-words bg-transparent pr-4', selected && 'font-semibold')}>
           {option.label}
         </span>
         {selected && (
