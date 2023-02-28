@@ -11,16 +11,12 @@ const AppShell = ({ children }: Props) => {
 
   return (
     <div
-      id="app-shell"
       role="dialog"
       data-theme="emerald"
-      className="fixed top-4 right-4 rounded-md bg-black/20 p-1 font-sans text-gray-900 shadow"
+      className="fixed top-4 right-4 rounded-md bg-black/20 p-1 font-sans text-gray-900 opacity-60 shadow blur-[2px] transition-opacity hover:opacity-100 hover:blur-none"
       style={{ transform: `translate(${x}px,${y}px)` }}
     >
-      <div
-        style={{ resize: 'vertical' }}
-        className="bg-base-100 max-h-[500px] w-[400px] overflow-y-auto overflow-x-clip rounded-md"
-      >
+      <div className="bg-base-100 max-h-[500px] w-[400px] overflow-y-auto overflow-x-clip rounded-md">
         <div
           className={tw('absolute inset-x-0 top-0 h-3', isDragging ? 'cursor-grabbing' : 'cursor-grab')}
           onMouseDown={onMouseDown}
