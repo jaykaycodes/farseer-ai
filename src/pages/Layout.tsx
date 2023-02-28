@@ -119,7 +119,7 @@ const Layout = () => {
 
   return (
     <>
-      <div className="flex h-10 items-center border-b border-gray-300 p-2 pt-0">
+      <div className="flex h-10 items-center border-b border-gray-300 p-2">
         {/* Left */}
         <div className="inline-flex h-full w-1/2 select-none items-center justify-start">{left}</div>
 
