@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import posthog from 'posthog-js'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 
+import { APP_WINDOW_DIMS } from '~lib/constants'
 import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
 import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
 import Layout, { loader as layoutLoader } from '~pages/Layout'
@@ -67,7 +68,9 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <div style={{ ...APP_WINDOW_DIMS }} className="flex flex-col overflow-auto">
+        <RouterProvider router={router} />
+      </div>
     </QueryClientProvider>
   )
 }

@@ -88,7 +88,7 @@ const Layout = () => {
 
   return (
     <>
-      <div className="flex h-10 items-center border-b border-gray-200 p-2">
+      <div className="flex h-10 w-full items-center border-b border-gray-200 p-2">
         {/* Left */}
         <div className="inline-flex h-full w-1/2 select-none items-center justify-start">{left}</div>
 
@@ -99,7 +99,7 @@ const Layout = () => {
         <div className="inline-flex h-full w-1/2 items-center justify-end"></div>
       </div>
 
-      <div className="p-3">
+      <div className="grow p-3">
         <Outlet />
       </div>
     </>
@@ -110,7 +110,6 @@ export default Layout
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const projects = await queryClient.fetchQuery({ ...projectsQuery, staleTime: Infinity })
-  console.log(projects.map((p) => p.id))
 
   if (projects.length === 0) {
     await resetProjects()

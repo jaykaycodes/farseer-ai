@@ -5,6 +5,8 @@ import { XIcon } from 'lucide-react'
 import { TOGGLE_PLUGIN_VISIBILITY } from '~lib/constants'
 import { tw } from '~lib/utils'
 
+import { APP_WINDOW_DIMS } from '../lib/constants'
+
 import css from 'data-text:~tailwind.css'
 
 export const getStyle = () => {
@@ -38,7 +40,7 @@ function AppShell() {
       {/* Container w/ drag handle */}
       <div
         className={tw(
-          'bg-base-100 h-[500px] w-[400px] overflow-y-auto overflow-x-clip rounded-md',
+          'bg-base-100 overflow-y-auto overflow-x-clip rounded-md',
           isDragging ? 'cursor-grabbing' : 'cursor-grab',
         )}
         onMouseDown={onMouseDown}
@@ -69,7 +71,8 @@ function AppShell() {
           title="Farseer AI"
           src={`chrome-extension://${chrome.runtime.id}/tabs/index.html`}
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-          className="h-full w-full"
+          style={{ ...APP_WINDOW_DIMS }}
+          className={tw('select-none', isDragging && 'pointer-events-none')}
         />
       </div>
     </div>

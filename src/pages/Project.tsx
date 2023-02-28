@@ -114,7 +114,7 @@ const ProjectPage = () => {
   }
 
   return (
-    <>
+    <div className="flex h-full w-full flex-col">
       <Section
         title="Fields"
         action={
@@ -186,7 +186,7 @@ const ProjectPage = () => {
         </div>
       </Section>
 
-      <div className="mt-3 flex w-full justify-end gap-x-1">
+      <div className="mt-auto flex w-full justify-end gap-x-1">
         {result && (
           <Link to="/results" className="btn btn-sm btn-outline">
             Show Results
@@ -203,7 +203,7 @@ const ProjectPage = () => {
       </div>
 
       {isSubmitError && <p className="error text-red-700 ">{submitError as string}</p>}
-    </>
+    </div>
   )
 }
 
@@ -268,7 +268,7 @@ const LinkListItem = ({ item: { to, title, subtitle } }: { item: LinkItem }) => 
 )
 
 const LinkList = ({ items }: { items: LinkItem[] }) => (
-  <ul className="divide-base-200 max-h-[300px] divide-y overflow-y-auto">
+  <ul className="divide-base-200 max-h-[200px] divide-y overflow-y-scroll">
     {items.map((item) => (
       <LinkListItem key={item.title} item={item} />
     ))}
