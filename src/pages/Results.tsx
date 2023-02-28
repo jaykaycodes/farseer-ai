@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useIsMutating } from '@tanstack/react-query'
 import { XIcon } from 'lucide-react'
@@ -12,6 +13,10 @@ const ResultsPage = () => {
   const navigate = useNavigate()
   const isMutating = 1 === useIsMutating({ mutationKey: SUBMIT_REQUEST_MUTATION_KEY, exact: true })
   const [result] = useStorage<IResult>(RESULT_STORAGE_KEY, {})
+
+  useEffect(() => {
+    if (result && process.env.NODE_ENV === 'development') console.log(result)
+  }, [result])
 
   const body = isMutating ? (
     <div className="p-4">

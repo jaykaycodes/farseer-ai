@@ -1,12 +1,41 @@
 import { Storage } from '@plasmohq/storage'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { AllExampleProjects, ExampleProjectType, makeExampleProject } from '~lib/utils'
 import type { IFieldConfig, IOutletConfig, IProject } from '~schemas'
 
 import Q from './_queries'
 import { getProject, getProjects } from './project.queries'
 
 const storage = new Storage()
+
+/**
+ *  PROJECTS MUTATIONS
+ */
+
+/** Resets projects storage to one or a few example projects (must have at least one) */
+export async function resetProjects(_types?: ExampleProjectType[] | '*'): Promise<IProject[]> {
+  const types = _types === '*' ? AllExampleProjects : _types
+  const projects =
+    types && types.length > 0 ? types.map((t) => makeExampleProject(t)) : [makeExampleProject(ExampleProjectType.RAW)]
+  storage.set('projects', projects)
+  return projects
+}
+
+export const useResetProjectsMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(resetProjects, {
+    onSuccess: () => {
+      // Invalidate all project realted queries
+      queryClient.invalidateQueries(Q.project._def)
+    },
+  })
+}
+
+/**
+ *  PROJECT MUTATIONS
+ */
 
 async function createProject(project: IProject): Promise<IProject> {
   const projects = await getProjects()
@@ -66,6 +95,10 @@ export const useDeleteProjectMutation = () => {
   })
 }
 
+/**
+ * PROJECT FIELD MUTATIONS
+ */
+
 const createProjectField = async ({ projectId, field }: { projectId: string; field: IFieldConfig }) => {
   const project = await getProject(projectId)
   project.fields.push(field)
@@ -123,6 +156,10 @@ export const useUpdateProjectFieldMutation = () => {
     },
   })
 }
+
+/**
+ * OUTLET MUTATIONS
+ */
 
 const createOutlet = async ({ projectId, outlet }: { projectId: string; outlet: IOutletConfig }) => {
   const project = await getProject(projectId)
