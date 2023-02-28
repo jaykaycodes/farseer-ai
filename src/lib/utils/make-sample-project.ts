@@ -6,22 +6,24 @@ export enum ExampleProjectType {
   PDP,
   LINKEDIN,
   ARTICLE,
-  RAW,
+  EMPTY,
 }
 
 export const AllExampleProjects = [
   ExampleProjectType.PDP,
   ExampleProjectType.LINKEDIN,
   ExampleProjectType.ARTICLE,
-  ExampleProjectType.RAW,
+  ExampleProjectType.EMPTY,
 ]
 
-export const makeExampleProject = (type: ExampleProjectType, overrides?: Partial<IProject>): IProject =>
-  factories[type](overrides)
+export const makeExampleProject = (
+  type: ExampleProjectType = ExampleProjectType.EMPTY,
+  overrides?: Partial<IProject>,
+): IProject => factories[type](overrides)
 
 const makeBaseField = (overrides?: Partial<IFieldConfig>): IFieldConfig => ({
   id: createId(),
-  name: 'My field',
+  name: 'New field',
   hint: 'What is this field for?',
   refinements: [{ rule: '' }],
   ...overrides,
@@ -29,7 +31,7 @@ const makeBaseField = (overrides?: Partial<IFieldConfig>): IFieldConfig => ({
 
 const makeBaseProject = (overrides?: Partial<IProject>): IProject => ({
   id: createId(),
-  name: 'My project',
+  name: 'Untitled project',
   fields: [makeBaseField()],
   outlets: [],
   ...overrides,
@@ -73,5 +75,5 @@ const factories: Record<ExampleProjectType, FactoryFn> = {
       ],
       ...overrides,
     }),
-  [ExampleProjectType.RAW]: makeBaseProject,
+  [ExampleProjectType.EMPTY]: makeBaseProject,
 }

@@ -1,25 +1,32 @@
+import { Disclosure, Transition } from '@headlessui/react'
 import { createId } from '@paralleldrive/cuid2'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronRightIcon } from 'lucide-react'
-import { Link, LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
+import { ChevronRightIcon, FilePlus2Icon } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Link, LoaderFunctionArgs, To, useNavigate, useParams } from 'react-router-dom'
 
+import TextField from '~components/fields/TextField'
 import { RESULT_STORAGE_KEY } from '~lib/constants'
 import { getSensibleParser4URL } from '~lib/parsers/utils'
 import { tw } from '~lib/utils'
+import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import {
   Q,
   queryClient,
   useCreateOutletMutation,
   useCreateProjectFieldMutation,
-  useDeleteProjectFieldMutation,
+  useCreateProjectMutation,
+  useDeleteProjectMutation,
   useSubmitRequestMutation,
+  useUpdateProjectMutation,
 } from '~queries'
-import { GenerateRequestSchema, IFieldConfig, IGenerateRequest, IOutletConfig, OutletType } from '~schemas'
+import { GenerateRequestSchema, IGenerateRequest, OutletType } from '~schemas'
 
 const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
 const ProjectPage = () => {
+  const [result] = useStorage(RESULT_STORAGE_KEY)
   const navigate = useNavigate()
   const projectId = useParams().projectId!
   const {
@@ -29,13 +36,17 @@ const ProjectPage = () => {
     error: submitError,
   } = useSubmitRequestMutation()
   const { data: project } = useQuery(projectQuery(projectId))
+  const { data: projects } = useQuery(Q.project.list)
+
   const { mutateAsync: createField, isLoading: isCreatingField } = useCreateProjectFieldMutation()
   const { mutateAsync: createOutlet, isLoading: isCreatingOutlet } = useCreateOutletMutation()
-  const { mutateAsync: deleteField } = useDeleteProjectFieldMutation()
+  const { mutateAsync: deleteProject } = useDeleteProjectMutation()
+  const { mutateAsync: duplicateProject, isLoading: isDuplicating } = useCreateProjectMutation()
+  const { mutateAsync: updateProject } = useUpdateProjectMutation()
 
-  const [result] = useStorage(RESULT_STORAGE_KEY)
+  const __skip_open_ai__ = useIsKeypressed('Shift') && process.env.NODE_ENV === 'development'
 
-  const handleSubmit = async (e: React.MouseEvent) => {
+  const handleSubmit = async () => {
     if (!project) return
 
     // store parser manual override for project
@@ -48,7 +59,7 @@ const ProjectPage = () => {
     const _data: IGenerateRequest = {
       content: html4Prompt,
       fields: project.fields,
-      __skip_open_ai__: process.env.NODE_ENV === 'development' && e.shiftKey,
+      __skip_open_ai__,
     }
     const data = GenerateRequestSchema.parse(_data)
 
@@ -70,10 +81,6 @@ const ProjectPage = () => {
     navigate(`field/${id}`)
   }
 
-  const handleDeleteField = async (fieldId: string) => {
-    deleteField({ projectId, fieldId })
-  }
-
   const handleAddOutlet = async () => {
     const id = createId()
     await createOutlet({
@@ -88,55 +95,96 @@ const ProjectPage = () => {
     navigate(`outlet/${id}`)
   }
 
+  const handleDeleteProject = async () => {
+    const index = projects?.findIndex((p) => p.id === projectId) ?? 0
+    deleteProject({ projectId })
+    if (projects) navigate(`/${projects[index > 0 ? index - 1 : 0].id}`)
+  }
+
+  const handleDuplicateProject = async () => {
+    if (!project) return
+    const id = createId()
+    await duplicateProject({ ...project, id })
+    navigate(`/${id}`)
+  }
+
+  const handleRenameProject = async (value: string) => {
+    if (!project) return
+    updateProject({ ...project, name: value })
+  }
+
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold">Fields</h2>
-        <div>
+    <>
+      <Section
+        title="Fields"
+        action={
           <button
             disabled={isCreatingField}
             type="button"
-            className={tw('btn btn-xs btn-link', isCreatingField && 'loading')}
+            data-tip="New Field"
+            className={tw(
+              'btn btn-xs btn-ghost btn-square tooltip tooltip-right flex justify-center',
+              isCreatingField && 'loading',
+            )}
             onClick={handleAddField}
           >
-            + Add Field
+            <FilePlus2Icon size={16} />
           </button>
-        </div>
-      </div>
+        }
+      >
+        <LinkList
+          items={
+            project?.fields.map((field) => ({ to: `field/${field.id}`, title: field.name, subtitle: field.hint })) ?? []
+          }
+        />
+      </Section>
 
-      <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
-        {project?.fields.map((field) => (
-          <FieldListItem
-            key={field.id}
-            field={field}
-            onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
-          />
-        ))}
-      </ul>
-
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold">Exports</h2>
-        <div>
+      <Section
+        title="Exports"
+        action={
           <button
             disabled={isCreatingOutlet}
             type="button"
-            className={tw('btn btn-xs btn-link', isCreatingOutlet && 'loading')}
+            data-tip="New Outlet"
+            className={tw(
+              'btn btn-xs btn-ghost btn-square tooltip tooltip-right flex justify-center',
+              isCreatingOutlet && 'loading',
+            )}
             onClick={handleAddOutlet}
           >
-            + Add Export
+            <FilePlus2Icon size={16} />
           </button>
-        </div>
-      </div>
+        }
+      >
+        <LinkList items={project?.outlets.map((outlet) => ({ to: `outlet/${outlet.id}`, title: outlet.type })) ?? []} />
+      </Section>
 
-      <ul className="divide-base-200 my-1 divide-y overflow-y-auto">
-        {project?.outlets.map((outlet) => (
-          <OutletListItem
-            key={outlet.id}
-            outlet={outlet}
-            // onDelete={project.fields.length > 1 ? () => handleDeleteField(field.id) : undefined}
+      <Section title="Settings">
+        <div>
+          <TextField
+            key={project?.id}
+            label="Project name"
+            defaultValue={project?.name}
+            className="input-xs"
+            onBlur={(e) => {
+              e.currentTarget.value && handleRenameProject(e.currentTarget.value)
+            }}
           />
-        ))}
-      </ul>
+          <div className="space-x-1">
+            <button
+              type="button"
+              disabled={isDuplicating}
+              className={tw('btn btn-xs btn-secondary btn-outline', isDuplicating && 'loading')}
+              onClick={handleDuplicateProject}
+            >
+              Duplicate
+            </button>
+            <button type="button" className="btn btn-xs btn-error btn-outline" onClick={handleDeleteProject}>
+              Delete
+            </button>
+          </div>
+        </div>
+      </Section>
 
       <div className="mt-3 flex w-full justify-end gap-x-1">
         {result && (
@@ -150,12 +198,12 @@ const ProjectPage = () => {
           className={tw('btn btn-sm', isSubmitting && 'loading')}
           onClick={handleSubmit}
         >
-          Run
+          {__skip_open_ai__ ? 'Run (skip OpenAI)' : 'Run'}
         </button>
       </div>
 
       {isSubmitError && <p className="error text-red-700 ">{submitError as string}</p>}
-    </div>
+    </>
   )
 }
 
@@ -165,40 +213,64 @@ export const loader = ({ params }: LoaderFunctionArgs) => {
 
 export default ProjectPage
 
-interface FieldListItemProps {
-  field: IFieldConfig
-  onDelete?: () => void
+interface SectionProps {
+  title: string
+  action?: ReactNode
+  children: ReactNode
 }
 
-const FieldListItem = ({ field }: FieldListItemProps) => (
+const Section = ({ title, action, children }: SectionProps) => (
+  <Disclosure>
+    {({ open }) => (
+      <>
+        <Disclosure.Button as="div" className="flex cursor-default items-center gap-x-2">
+          <div className="inline-flex cursor-pointer items-center">
+            <ChevronRightIcon className={tw('h-5 w-5 transition-transform', open && 'rotate-90')} />
+            <h2 className="select-none text-lg font-bold">{title}</h2>
+          </div>
+          {action}
+        </Disclosure.Button>
+        <Transition
+          show={open}
+          enter="transition duration-150 ease-out"
+          enterFrom="transform scale-95 opacity-0"
+          enterTo="transform scale-100 opacity-100"
+          leave="transition duration-150 ease-out"
+          leaveFrom="transform scale-100 opacity-100"
+          leaveTo="transform scale-95 opacity-0"
+        >
+          <Disclosure.Panel>{children}</Disclosure.Panel>
+        </Transition>
+      </>
+    )}
+  </Disclosure>
+)
+
+interface LinkItem {
+  to: To
+  title: string
+  subtitle?: string
+}
+
+const LinkListItem = ({ item: { to, title, subtitle } }: { item: LinkItem }) => (
   <li className="hover:bg-base-200">
-    <Link to={`field/${field.id}`} className="flex justify-between p-2">
+    <Link to={to} className="flex justify-between py-1 px-2">
       <div>
-        <h3 className="text-sm font-semibold">{field.name}</h3>
-        <p className="text-xs text-gray-700">{field.hint}</p>
+        <h3 className="text-sm font-semibold">{title}</h3>
+        {subtitle && <p className="text-xs text-gray-700">{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-x-1">
+      <div className="flex items-center">
         <ChevronRightIcon size={20} className="text-base-300 scale-y-150" />
       </div>
     </Link>
   </li>
 )
 
-interface OutletListItemProps {
-  outlet: IOutletConfig
-}
-
-const OutletListItem = ({ outlet }: OutletListItemProps) => (
-  <li className="hover:bg-base-200">
-    <Link to={`outlet/${outlet.id}`} className="flex justify-between p-2">
-      <div>
-        <h3 className="text-sm font-semibold">{outlet.type}</h3>
-      </div>
-
-      <div className="flex items-center gap-x-1">
-        <ChevronRightIcon size={20} className="text-base-300 scale-y-150" />
-      </div>
-    </Link>
-  </li>
+const LinkList = ({ items }: { items: LinkItem[] }) => (
+  <ul className="divide-base-200 max-h-[300px] divide-y overflow-y-auto">
+    {items.map((item) => (
+      <LinkListItem key={item.title} item={item} />
+    ))}
+  </ul>
 )

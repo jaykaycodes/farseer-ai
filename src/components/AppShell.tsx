@@ -1,24 +1,30 @@
 import { useEffect, useState } from 'react'
 
+import { tw } from '~lib/utils'
+
 interface Props {
   children: React.ReactNode
 }
 
 const AppShell = ({ children }: Props) => {
-  const { x, y, onMouseDown } = useDraggable()
+  const { x, y, onMouseDown, isDragging } = useDraggable()
 
   return (
     <div
+      id="app-shell"
+      role="dialog"
       data-theme="emerald"
-      className="fixed top-4 right-4 rounded-md bg-black/50 p-1 font-sans text-gray-900 shadow"
+      className="fixed top-4 right-4 rounded-md bg-black/20 p-1 font-sans text-gray-900 shadow"
       style={{ transform: `translate(${x}px,${y}px)` }}
     >
       <div
         style={{ resize: 'vertical' }}
-        className="bg-base-100 max-h-[420px] w-[380px] overflow-y-auto overflow-x-clip rounded-md"
+        className="bg-base-100 max-h-[500px] w-[400px] overflow-y-auto overflow-x-clip rounded-md"
       >
-        <div className="h-2 w-full cursor-move" onMouseDown={onMouseDown} />
-
+        <div
+          className={tw('absolute inset-x-0 top-0 h-3', isDragging ? 'cursor-grabbing' : 'cursor-grab')}
+          onMouseDown={onMouseDown}
+        />
         {children}
       </div>
     </div>
@@ -54,5 +60,5 @@ function useDraggable() {
     return () => window.removeEventListener('mouseup', onMouseUp)
   }, [])
 
-  return { x: xTranslate, y: yTranslate, onMouseDown }
+  return { x: xTranslate, y: yTranslate, onMouseDown, isDragging }
 }

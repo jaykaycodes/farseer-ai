@@ -17,7 +17,7 @@ const storage = new Storage()
 export async function resetProjects(_types?: ExampleProjectType[] | '*'): Promise<IProject[]> {
   const types = _types === '*' ? AllExampleProjects : _types
   const projects =
-    types && types.length > 0 ? types.map((t) => makeExampleProject(t)) : [makeExampleProject(ExampleProjectType.RAW)]
+    types && types.length > 0 ? types.map((t) => makeExampleProject(t)) : [makeExampleProject(ExampleProjectType.EMPTY)]
   storage.set('projects', projects)
   return projects
 }
