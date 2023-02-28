@@ -1,7 +1,7 @@
 import { Storage } from '@plasmohq/storage'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { BootstrappedProject, bootstrapProject } from '~lib/utils'
+import { AllExampleProjects, ExampleProjectType, makeExampleProject } from '~lib/utils'
 import type { IFieldConfig, IOutletConfig, IProject } from '~schemas'
 
 import Q from './_queries'
@@ -13,8 +13,11 @@ const storage = new Storage()
  *  PROJECTS MUTATIONS
  */
 
-export async function resetProjects(bootstraps: BootstrappedProject[] = [{ strategy: 'raw' }]): Promise<IProject[]> {
-  const projects = bootstraps.map((project) => bootstrapProject(project))
+/** Resets projects storage to one or a few example projects (must have at least one) */
+export async function resetProjects(_types?: ExampleProjectType[] | '*'): Promise<IProject[]> {
+  const types = _types === '*' ? AllExampleProjects : _types
+  const projects =
+    types && types.length > 0 ? types.map((t) => makeExampleProject(t)) : [makeExampleProject(ExampleProjectType.RAW)]
   storage.set('projects', projects)
   return projects
 }

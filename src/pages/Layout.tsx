@@ -98,12 +98,7 @@ const Layout = () => {
                 className={tw('tooltip tooltip-bottom', isCreatingProject && 'loading')}
                 data-tip="Reset Project"
                 onClick={async () => {
-                  const projects = await resetAllProjects([
-                    { strategy: 'pdp' },
-                    { strategy: 'linkedin' },
-                    { strategy: 'article' },
-                    { strategy: 'raw' },
-                  ])
+                  const projects = await resetAllProjects('*')
                   navigate(`/${projects[0].id}` ?? '/')
                 }}
               >
