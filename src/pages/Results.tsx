@@ -1,15 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
-import { useIsMutating, useQuery } from '@tanstack/react-query'
+import { useIsMutating } from '@tanstack/react-query'
 import { XIcon } from 'lucide-react'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import { RESULT_STORAGE_KEY } from '~lib/constants'
 import { tw } from '~lib/utils'
-import { Q, SUBMIT_REQUEST_MUTATION_KEY, useExportResultsRequestMutations } from '~queries'
+import { SUBMIT_REQUEST_MUTATION_KEY, useExportResultMutation } from '~queries'
 import type { IResult } from '~schemas'
-
-const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
 const ResultsPage = () => {
   const navigate = useNavigate()
@@ -17,17 +15,18 @@ const ResultsPage = () => {
   const [result] = useStorage<IResult>(RESULT_STORAGE_KEY, {})
 
   const projectId = useParams().projectId!
-  const { data: project } = useQuery(projectQuery(projectId))
-  const outlets = useMemo(() => project?.outlets.map((o) => o), [project])
-  const mutations = useExportResultsRequestMutations(outlets || [])
+  const {
+    mutateAsync: exportResult,
+    isLoading: isSendingExport,
+    isSuccess: isSuccessExport,
+    isError: isErrorExport,
+    error,
+  } = useExportResultMutation()
 
   const handleExport = () => {
-    if (!outlets) return
-    if (!result) return
+    if (!result || !projectId) return
 
-    if (process.env.NODE_ENV === 'development') console.log('Exporting to outlets: ', outlets)
-
-    mutations.forEach(({ mutation, outlet }) => mutation.mutateAsync({ payload: result, config: outlet }))
+    exportResult({ projectId, result })
   }
 
   useEffect(() => {
@@ -54,10 +53,16 @@ const ResultsPage = () => {
           ))}
         </tbody>
       </table>
+      {/* Temporary Feedback */}
+      {isSendingExport && <div className="base-300 text-sm">Sending...</div>}
+      {isSuccessExport && <div className="text-success-content bg-success w-fit rounded py-1 px-4 text-sm">Sent</div>}
+      {isErrorExport && (
+        <div className="text-error-content bg-error  w-fit rounded py-1 px-4 text-sm">{(error as Error).message}</div>
+      )}
       <div className="mt-2 flex justify-end">
         <button
           type="button"
-          disabled={mutations.reduce((acc, { mutation }) => acc || mutation.isLoading, false)}
+          disabled={isSendingExport}
           onClick={handleExport}
           className={tw('btn btn-sm' /* sendingToOutlet && 'loading' */)}
         >

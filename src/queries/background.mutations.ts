@@ -7,12 +7,17 @@ import {
   GenerateResponseSchema,
   IGenerateRequest,
   IGenerateResponse,
-  IOutletConfig,
   IOutletRequest,
   IOutletResponse,
   IResult,
   OutletResponseSchema,
 } from '~schemas'
+
+import { getProject } from './project.queries'
+
+/**
+ * GENERATE
+ */
 
 async function submitRequest(body: IGenerateRequest): Promise<IResult> {
   const _res = await sendToBackground<IGenerateRequest, IGenerateResponse>({
@@ -53,25 +58,29 @@ export const useSubmitRequestMutation = (persist = false) => {
   })
 }
 
-async function exportResultsRequest(body: IOutletRequest): Promise<IOutletResponse> {
-  const _res = await sendToBackground<IOutletRequest, IOutletResponse>({
-    name: 'send-to-outlet',
-    body,
-  })
+/**
+ * EXPORTS
+ */
 
-  const res = OutletResponseSchema.parse(_res)
-
-  if (res.ok && process.env.NODE_ENV === 'development') {
-    console.log('Result exported successfully!')
+async function exportResult({ projectId, result }: { projectId: string; result: IResult }): Promise<IOutletResponse[]> {
+  if (!result) {
+    throw new Error('No result to export!')
   }
+  // Grab outlets for project
+  const project = await getProject(projectId)
+  // Build our requests
+  const requests = project.outlets.map((config) =>
+    sendToBackground<IOutletRequest, IOutletResponse>({ name: 'send-to-outlet', body: { config, result } }).then(
+      (res) => OutletResponseSchema.parse(res),
+    ),
+  )
+  const res = await Promise.all(requests)
+
+  if (res.some((r) => !r.ok)) throw new Error('One or more outlets failed to export the result')
 
   return res
 }
 
-export const EXPORT_RESULTS_MUTATION_KEY = 'submitFieldRequest'
-export const useExportResultsRequestMutations = (outlets: IOutletConfig[]) => {
-  return outlets.map((outlet) => ({
-    outlet,
-    mutation: useMutation({ mutationFn: exportResultsRequest, mutationKey: [EXPORT_RESULTS_MUTATION_KEY, outlet.id] }),
-  }))
+export const useExportResultMutation = () => {
+  return useMutation(exportResult)
 }

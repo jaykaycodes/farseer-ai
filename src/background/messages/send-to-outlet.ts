@@ -5,9 +5,9 @@ import * as outlets from '~lib/outlets'
 import { IBaseOutletConfig, IOutletRequest, IOutletResponse, OutletType } from '~schemas'
 
 const handler: PlasmoMessaging.MessageHandler<IOutletRequest, IOutletResponse> = async (req, res) => {
-  const { config, payload } = req.body ?? {}
+  const { config, result } = req.body ?? {}
   if (!config) throw new Error('Outlet config not found')
-  if (!payload) throw new Error('No payload found')
+  if (!result) throw new Error('No payload found')
 
   let outlet: OutletBase<IBaseOutletConfig>
   switch (config.type) {
@@ -18,7 +18,7 @@ const handler: PlasmoMessaging.MessageHandler<IOutletRequest, IOutletResponse> =
       outlet = new outlets.HTTPOutlet(config)
   }
 
-  const outletResponse = await outlet.send(payload)
+  const outletResponse = await outlet.send(result)
   res.send(outletResponse)
 }
 

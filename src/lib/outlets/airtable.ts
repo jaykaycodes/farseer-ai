@@ -16,6 +16,6 @@ export class AirtableOutlet extends OutletBase<IAirtableOutletConfig> {
       }),
     })
 
-    if (res.status !== 200) throw new Error(res.statusText || 'Unknown error')
+    if (res.status < 200 || res.status >= 300) throw new Error(`${res.status} - ${res.statusText || 'Unknown error'}`)
   }
 }
