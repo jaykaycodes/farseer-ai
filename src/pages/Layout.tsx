@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
+import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronLeftIcon, FilePlus2Icon, RecycleIcon, XIcon } from 'lucide-react'
+import { ChevronLeftIcon, FilePlus2Icon, Maximize2Icon, Minimize2Icon, RecycleIcon, XIcon } from 'lucide-react'
 import {
   Link,
   LoaderFunctionArgs,
@@ -22,10 +23,13 @@ const assertHandle = (handle: unknown): handle is Record<string, unknown> => Boo
 const projectsQuery = Q.project.list
 
 const Layout = () => {
+  const { setShow } = useShowWindow()
+  const [minimized, setMinimized] = useStorage('minimized', false)
   const navigate = useNavigate()
+
   const { data: projects } = useQuery(projectsQuery)
   const projectId = useParams().projectId!
-  const { setShow } = useShowWindow()
+
   const matches = useMatches()
   const rootMatch = useMatch('/:projectId')
 
@@ -102,20 +106,21 @@ const Layout = () => {
         <div className="inline-flex h-full shrink-0 items-center">{middle}</div>
 
         {/* Right */}
-        <div className="inline-flex h-full w-1/2 items-center justify-end">
+        <div className="inline-flex h-full w-1/2 items-center justify-end gap-x-1">
           <button
             type="button"
             className="flex items-center focus:outline-offset-0"
-            onClick={() => {
-              setShow(false)
-            }}
+            onClick={() => setMinimized((m) => !m)}
           >
+            {minimized ? <Maximize2Icon size={14} /> : <Minimize2Icon size={14} />}
+          </button>
+          <button type="button" className="flex items-center focus:outline-offset-0" onClick={() => setShow(false)}>
             <XIcon size={18} />
           </button>
         </div>
       </div>
 
-      <div className="p-3">
+      <div className={tw('p-3 transition-transform', minimized ? 'h-0 max-h-0 p-0' : 'h-auto')}>
         <Outlet />
       </div>
     </>
