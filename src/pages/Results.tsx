@@ -1,17 +1,40 @@
+import { useEffect, useMemo } from 'react'
 import { useStorage } from '@plasmohq/storage/hook'
-import { useIsMutating } from '@tanstack/react-query'
+import { useIsMutating, useQuery } from '@tanstack/react-query'
 import { XIcon } from 'lucide-react'
-import { LoaderFunctionArgs, useNavigate } from 'react-router-dom'
+import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import { RESULT_STORAGE_KEY } from '~lib/constants'
 import { tw } from '~lib/utils'
-import { SUBMIT_REQUEST_MUTATION_KEY } from '~queries'
+import { Q, SUBMIT_REQUEST_MUTATION_KEY, useExportResultsRequestMutations } from '~queries'
 import type { IResult } from '~schemas'
+
+const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
 const ResultsPage = () => {
   const navigate = useNavigate()
   const isMutating = 1 === useIsMutating({ mutationKey: SUBMIT_REQUEST_MUTATION_KEY, exact: true })
   const [result] = useStorage<IResult>(RESULT_STORAGE_KEY, {})
+
+  // @jake didn't know whether to make an outlets query, or just use the project query.  Went with the latter.
+  // Any opinions?
+  const projectId = useParams().projectId!
+  const { data: project } = useQuery(projectQuery(projectId))
+  const outlets = useMemo(() => project?.outlets.map((o) => o), [project])
+  const mutations = useExportResultsRequestMutations(outlets || [])
+
+  const handleExport = () => {
+    if (!outlets) return
+    if (!result) return
+
+    if (process.env.NODE_ENV === 'development') console.log('Exporting to outlets: ', outlets)
+
+    mutations.forEach(({ mutation, outlet }) => mutation.mutateAsync({ payload: result, config: outlet }))
+  }
+
+  useEffect(() => {
+    if (result && process.env.NODE_ENV === 'development') console.log(result)
+  }, [result])
 
   const body = isMutating ? (
     <div className="p-4">
@@ -36,8 +59,8 @@ const ResultsPage = () => {
       <div className="mt-2 flex justify-end">
         <button
           type="button"
-          // disabled={sendingToOutlet}
-          // onClick={async () => await sendToOutlet()}
+          disabled={mutations.reduce((acc, { mutation }) => acc || mutation.isLoading, false)}
+          onClick={handleExport}
           className={tw('btn btn-sm' /* sendingToOutlet && 'loading' */)}
         >
           Export

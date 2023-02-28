@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { FieldConfigSchema, OutletConfigSchema as OutletConfigSchema } from './project.schema'
+import { FieldConfigSchema, OutletConfigSchema } from './project.schema'
 import { ResultSchema } from './result.schema'
 
 /**

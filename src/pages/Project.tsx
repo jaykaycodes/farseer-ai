@@ -56,7 +56,7 @@ const ProjectPage = () => {
     const data = GenerateRequestSchema.parse(_data)
 
     submitRequest(data)
-    navigate('/results')
+    navigate(`/${projectId}/results`)
   }
 
   const handleAddField = async () => {
@@ -82,6 +82,7 @@ const ProjectPage = () => {
         type: OutletType.Airtable,
         baseId: 'app123',
         tableId: 'table123',
+        authToken: 'auth123',
       },
     })
     navigate(`outlet/${id}`)
@@ -260,9 +261,9 @@ const LinkListItem = ({ item: { to, title, subtitle } }: { item: LinkItem }) => 
 )
 
 const LinkList = ({ items }: { items: LinkItem[] }) => (
-  <ul className="divide-base-200 max-h-[200px] divide-y overflow-y-scroll">
-    {items.map((item) => (
-      <LinkListItem key={item.title} item={item} />
+  <ul className="divide-base-200 max-h-[200px] divide-y overflow-y-auto">
+    {items.map((item, idx) => (
+      <LinkListItem key={`${item.title}-${idx}`} item={item} />
     ))}
   </ul>
 )

@@ -49,7 +49,7 @@ export const router = createMemoryRouter([
   },
   // Results renders its own layout
   {
-    path: 'results',
+    path: ':projectId/results',
     element: <ResultsPage />,
     loader: resultsLoader,
   },
