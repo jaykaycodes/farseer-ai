@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { throttle } from 'lodash-es'
 import { XIcon } from 'lucide-react'
 
-import { TOGGLE_PLUGIN_VISIBILITY } from '~lib/constants'
+import { APP_MESSAGES } from '~lib/constants'
 import { tw } from '~lib/utils'
 
 import { APP_WINDOW_DIMS } from '../lib/constants'
@@ -19,9 +19,10 @@ function AppShell() {
   const [show, setShow] = useState(process.env.NODE_ENV === 'development')
   const { x, y, onMouseDown, isDragging } = useDraggable()
 
+  // Setup listener for messages from background script
   useEffect(() => {
     const recvMsg = throttle((msg: unknown) => {
-      if (msg === TOGGLE_PLUGIN_VISIBILITY) setShow((p) => !p)
+      if (msg === APP_MESSAGES.TOGGLE_PLUGIN_VISIBILITY) setShow((p) => !p)
     }, 50)
 
     chrome.runtime.onMessage.addListener(recvMsg)

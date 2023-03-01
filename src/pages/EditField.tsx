@@ -15,7 +15,7 @@ import {
   Q,
   queryClient,
   useDeleteProjectFieldMutation,
-  useSimpleSubmitRequestMutation,
+  useSubmitRequestMutation,
   useUpdateProjectFieldMutation,
 } from '~queries'
 import { FieldConfigSchema, GenerateRequestSchema, IFieldConfig, IGenerateRequest } from '~schemas'
@@ -120,7 +120,7 @@ const EditFieldPage = () => {
     isSuccess: isSubmitSuccess,
     isError: isSubmitError,
     error: submitError,
-  } = useSimpleSubmitRequestMutation()
+  } = useSubmitRequestMutation()
 
   const handleTestRun = async (e: React.MouseEvent) => {
     // store parser manual override for project
@@ -131,7 +131,6 @@ const EditFieldPage = () => {
 
     // TODO clean this up - but basically we want to validate the data is filled in before passing to background
     const _data: IGenerateRequest = {
-      content: html4Prompt,
       fields: [form.getValues()],
       __skip_open_ai__: process.env.NODE_ENV === 'development' && e.shiftKey,
     }

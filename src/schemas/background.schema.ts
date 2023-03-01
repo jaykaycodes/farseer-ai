@@ -16,7 +16,6 @@ export const RequiredFieldConfigSchema = FieldConfigSchema.extend({
  */
 export const GenerateRequestSchema = z.object({
   fields: z.array(RequiredFieldConfigSchema),
-  content: z.string(),
   __skip_open_ai__: z.boolean().optional(),
 })
 export type IGenerateRequest = z.infer<typeof GenerateRequestSchema>

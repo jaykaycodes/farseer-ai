@@ -8,7 +8,6 @@ import { Link, LoaderFunctionArgs, To, useNavigate, useParams } from 'react-rout
 
 import TextField from '~components/fields/TextField'
 import { RESULT_STORAGE_KEY } from '~lib/constants'
-import { getSensibleParser4URL } from '~lib/parsers/utils'
 import { tw } from '~lib/utils'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import {
@@ -34,7 +33,7 @@ const ProjectPage = () => {
     isLoading: isSubmitting,
     isError: isSubmitError,
     error: submitError,
-  } = useSubmitRequestMutation()
+  } = useSubmitRequestMutation(true)
   const { data: project } = useQuery(projectQuery(projectId))
   const { data: projects } = useQuery(Q.project.list)
 
@@ -49,15 +48,8 @@ const ProjectPage = () => {
   const handleSubmit = async () => {
     if (!project) return
 
-    // store parser manual override for project
-    const parser = getSensibleParser4URL(new URL(window.location.href))
-    const html4Prompt = parser.doc2Html4Prompt(document)
-
-    if (process.env.NODE_ENV === 'development') console.log(html4Prompt)
-
     // TODO clean this up - but basically we want to validate the data is filled in before passing to background
     const _data: IGenerateRequest = {
-      content: html4Prompt,
       fields: project.fields,
       __skip_open_ai__,
     }

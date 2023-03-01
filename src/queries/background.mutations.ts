@@ -1,7 +1,6 @@
 import { sendToBackground } from '@plasmohq/messaging'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useMutation } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
 
 import { RESULT_STORAGE_KEY } from '~lib/constants'
 import { GenerateResponseSchema, IGenerateRequest, IGenerateResponse, IResult } from '~schemas'
@@ -25,23 +24,15 @@ async function submitRequest(body: IGenerateRequest): Promise<IResult> {
   throw res.error
 }
 
-export const useSimpleSubmitRequestMutation = () => {
-  return useMutation(submitRequest)
-}
-
 export const SUBMIT_REQUEST_MUTATION_KEY = ['submitRequest']
-export const useSubmitRequestMutation = () => {
+export const useSubmitRequestMutation = (persist = false) => {
   const [_, setStore] = useStorage<IResult>(RESULT_STORAGE_KEY, null)
-  const navigate = useNavigate()
 
   return useMutation({
-    mutationKey: SUBMIT_REQUEST_MUTATION_KEY,
+    mutationKey: persist ? SUBMIT_REQUEST_MUTATION_KEY : undefined,
     mutationFn: submitRequest,
-    onMutate: () => {
-      navigate('/results')
-    },
     onSuccess: (data) => {
-      setStore(data)
+      if (persist) setStore(data)
       // TODO invalidate execution history query when we have it
       // queryClient.invalidateQueries(Q.project.list.queryKey)
     },

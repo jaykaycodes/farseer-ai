@@ -1,6 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
 
+import { APP_MESSAGES } from '~lib/constants'
 import type { IGenerateRequest, IGenerateResponse, IResult } from '~schemas'
 
 const HTML_CHAR_LIMIT = 10000
@@ -8,16 +9,26 @@ const HTML_CHAR_LIMIT = 10000
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
 const fakeRawResult = '{ "name": "John Doe", "age": 43, "city": "New York" }'
 
+const extractActiveTabContent = (): Promise<string> =>
+  new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTabId = tabs[0].id
+      if (!activeTabId) return reject('No active tab!')
+      chrome.tabs.sendMessage(activeTabId, APP_MESSAGES.EXTRACT_CONTENT, resolve)
+    })
+  })
+
 const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateResponse> = async (req, res) => {
-  if (!req.body || req.body.content.length === 0) {
+  if (!req.body || req.body.fields.length === 0) {
     res.send({
       ok: false,
-      error: 'Content was empty',
+      error: 'No fields found in request',
     })
     return
   }
 
-  const willTruncate = req.body.content.length > HTML_CHAR_LIMIT
+  const content = await extractActiveTabContent()
+  const willTruncate = content.length > HTML_CHAR_LIMIT
 
   const promptInstructionObjs = req.body.fields
     .map((field) => {
@@ -39,7 +50,7 @@ const handler: PlasmoMessaging.MessageHandler<IGenerateRequest, IGenerateRespons
 ${promptInstructionObjs}
 
 Note: This html does not have closing tags.${willTruncate ? ' This html has been truncated.' : ''}\n`
-  prompt += `"""html\n${req.body.content.slice(0, HTML_CHAR_LIMIT)}\n"""\n`
+  prompt += `"""html\n${content.slice(0, HTML_CHAR_LIMIT)}\n"""\n`
 
   // Need to add a prefix but also add it to our output
   const resultPrefix = `\n{"${req.body.fields[0].name}":`
