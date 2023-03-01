@@ -38,9 +38,8 @@ async function submitRequest(body: IGenerateRequest): Promise<IResult> {
   throw res.error
 }
 
-export const SUBMIT_FIELD_REQUEST_MUTATION_KEY = ['submitFieldRequest']
 export const useSimpleSubmitRequestMutation = () => {
-  return useMutation({ mutationFn: submitRequest, mutationKey: SUBMIT_FIELD_REQUEST_MUTATION_KEY })
+  return useMutation(submitRequest)
 }
 
 export const SUBMIT_REQUEST_MUTATION_KEY = ['submitRequest']

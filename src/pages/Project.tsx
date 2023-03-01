@@ -1,9 +1,10 @@
+import { ReactNode, useMemo } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
 import { createId } from '@paralleldrive/cuid2'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronRightIcon, FilePlus2Icon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import classnames from 'classnames'
+import { ChevronRightIcon, FilePlus2Icon, WebhookIcon } from 'lucide-react'
 import { Link, LoaderFunctionArgs, To, useNavigate, useParams } from 'react-router-dom'
 
 import TextField from '~components/fields/TextField'
@@ -21,6 +22,8 @@ import {
   useUpdateProjectMutation,
 } from '~queries'
 import { GenerateRequestSchema, IGenerateRequest, OutletType } from '~schemas'
+
+import airtable from 'data-base64:~assets/outletIcons/airtable.png'
 
 const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
@@ -108,76 +111,86 @@ const ProjectPage = () => {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <Section
-        title="Fields"
-        action={
-          <button
-            disabled={isCreatingField}
-            type="button"
-            data-tip="New Field"
-            className={tw(
-              'btn btn-xs btn-ghost btn-square tooltip tooltip-right flex justify-center',
-              isCreatingField && 'loading',
-            )}
-            onClick={handleAddField}
-          >
-            <FilePlus2Icon size={16} />
-          </button>
-        }
-      >
-        <LinkList
-          items={
-            project?.fields.map((field) => ({ to: `field/${field.id}`, title: field.name, subtitle: field.hint })) ?? []
-          }
-        />
-      </Section>
-
-      <Section
-        title="Exports"
-        action={
-          <button
-            disabled={isCreatingOutlet}
-            type="button"
-            data-tip="New Outlet"
-            className={tw(
-              'btn btn-xs btn-ghost btn-square tooltip tooltip-right flex justify-center',
-              isCreatingOutlet && 'loading',
-            )}
-            onClick={handleAddOutlet}
-          >
-            <FilePlus2Icon size={16} />
-          </button>
-        }
-      >
-        <LinkList items={project?.outlets.map((outlet) => ({ to: `outlet/${outlet.id}`, title: outlet.type })) ?? []} />
-      </Section>
-
-      <Section title="Settings">
-        <div>
-          <TextField
-            key={project?.id}
-            label="Project name"
-            defaultValue={project?.name}
-            className="input-xs"
-            onBlur={(e) => {
-              e.currentTarget.value && handleRenameProject(e.currentTarget.value)
-            }}
-          />
-          <div className="space-x-1">
+      <div className="space-y-2">
+        <Section
+          title="Fields"
+          action={
             <button
+              disabled={isCreatingField}
               type="button"
-              disabled={isDuplicating}
-              className={tw('btn btn-xs btn-secondary btn-outline', isDuplicating && 'loading')}
-              onClick={handleDuplicateProject}
+              data-tip="New Field"
+              className={tw(
+                'btn btn-xs btn-ghost btn-square tooltip tooltip-right flex justify-center',
+                isCreatingField && 'loading',
+              )}
+              onClick={handleAddField}
             >
-              Duplicate
+              <FilePlus2Icon size={16} />
             </button>
-            <button type="button" className="btn btn-xs btn-error btn-outline" onClick={handleDeleteProject}>
-              Delete
+          }
+        >
+          <LinkList
+            type="row"
+            items={
+              project?.fields.map((field) => ({
+                to: `field/${field.id}`,
+                id: field.id,
+                args: { title: field.name, subtitle: field.hint },
+              })) ?? []
+            }
+          />
+        </Section>
+
+        <Section
+          title="Exports"
+          action={
+            <button
+              disabled={isCreatingOutlet}
+              type="button"
+              data-tip="New Outlet"
+              className={tw(
+                'btn btn-xs btn-ghost btn-square tooltip tooltip-right flex justify-center',
+                isCreatingOutlet && 'loading',
+              )}
+              onClick={handleAddOutlet}
+            >
+              <FilePlus2Icon size={16} />
             </button>
+          }
+        >
+          <LinkList
+            type="button"
+            items={project?.outlets.map(({ id, type }) => ({ to: `outlet/${id}`, id, args: { type } })) ?? []}
+          />
+        </Section>
+
+        <Section title="Settings">
+          <div>
+            <TextField
+              key={project?.id}
+              label="Project name"
+              defaultValue={project?.name}
+              className="input-xs"
+              onBlur={(e) => {
+                e.currentTarget.value && handleRenameProject(e.currentTarget.value)
+              }}
+            />
+            <div className="space-x-1">
+              <button
+                type="button"
+                disabled={isDuplicating}
+                className={tw('btn btn-xs btn-secondary btn-outline', isDuplicating && 'loading')}
+                onClick={handleDuplicateProject}
+              >
+                Duplicate
+              </button>
+              <button type="button" className="btn btn-xs btn-error btn-outline" onClick={handleDeleteProject}>
+                Delete
+              </button>
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      </div>
 
       <div className="mt-auto flex w-full justify-end gap-x-1">
         {result && (
@@ -195,7 +208,7 @@ const ProjectPage = () => {
         </button>
       </div>
 
-      {isSubmitError && <p className="error text-red-700 ">{submitError as string}</p>}
+      {isSubmitError && <p className="error text-error-content ">{submitError as string}</p>}
     </div>
   )
 }
@@ -219,7 +232,7 @@ const Section = ({ title, action, children }: SectionProps) => (
         <Disclosure.Button as="div" className="flex cursor-default items-center gap-x-2">
           <div className="inline-flex cursor-pointer items-center">
             <ChevronRightIcon className={tw('h-5 w-5 transition-transform', open && 'rotate-90')} />
-            <h2 className="select-none text-lg font-bold">{title}</h2>
+            <h2 className="select-none text-lg font-bold leading-none">{title}</h2>
           </div>
           {action}
         </Disclosure.Button>
@@ -232,25 +245,32 @@ const Section = ({ title, action, children }: SectionProps) => (
           leaveFrom="transform scale-100 opacity-100"
           leaveTo="transform scale-95 opacity-0"
         >
-          <Disclosure.Panel>{children}</Disclosure.Panel>
+          <Disclosure.Panel className={'mx-4'}>{children}</Disclosure.Panel>
         </Transition>
       </>
     )}
   </Disclosure>
 )
 
-interface LinkItem {
+interface LinkItem<ItemArgs> {
   to: To
-  title: string
-  subtitle?: string
+  id: string
+  args: ItemArgs
 }
 
-const LinkListItem = ({ item: { to, title, subtitle } }: { item: LinkItem }) => (
+const RowListItem = ({
+  item: {
+    to,
+    args: { title, subtitle },
+  },
+}: {
+  item: LinkItem<{ title: string; subtitle?: string }>
+}) => (
   <li className="hover:bg-base-200">
     <Link to={to} className="flex justify-between py-1 px-2">
       <div>
-        <h3 className="text-sm font-semibold">{title}</h3>
-        {subtitle && <p className="text-xs text-gray-700">{subtitle}</p>}
+        <h3 className="font-semibold">{title}</h3>
+        {subtitle && <p className="text-sm text-gray-700">{subtitle}</p>}
       </div>
 
       <div className="flex items-center">
@@ -260,10 +280,48 @@ const LinkListItem = ({ item: { to, title, subtitle } }: { item: LinkItem }) => 
   </li>
 )
 
-const LinkList = ({ items }: { items: LinkItem[] }) => (
-  <ul className="divide-base-200 max-h-[200px] divide-y overflow-y-auto">
-    {items.map((item, idx) => (
-      <LinkListItem key={`${item.title}-${idx}`} item={item} />
-    ))}
+const ButtonListItem = ({
+  item: {
+    to,
+    args: { type },
+  },
+}: {
+  item: LinkItem<{ type: OutletType }>
+}) => {
+  const icon = useMemo(() => {
+    switch (type) {
+      case 'airtable':
+        return <img className={'mx-auto'} src={airtable} width={30} height={30} alt="airtable icon" />
+      case 'http':
+        return <WebhookIcon className={'mx-auto'} size={30} />
+    }
+  }, [type])
+
+  return (
+    <Link to={to}>
+      <li className="hover:bg-base-200 rounded border py-3 shadow">
+        {icon}
+        <h3 className="mt-2 text-center text-xs font-semibold uppercase leading-none">{type}</h3>
+      </li>
+    </Link>
+  )
+}
+
+const LinkList = ({
+  items,
+  type,
+}:
+  | { items: LinkItem<{ type: OutletType }>[]; type: 'button' }
+  | { items: LinkItem<{ title: string; subtitle?: string }>[]; type: 'row' }) => (
+  <ul
+    className={classnames(
+      'max-h-[200px] overflow-y-auto',
+      type === 'row' && 'divide-base-200 divide-y',
+      type === 'button' && 'grid grid-cols-3 gap-6 mx-2',
+    )}
+  >
+    {type === 'row'
+      ? items.map((item) => <RowListItem key={item.id} item={item} />)
+      : items.map((item) => <ButtonListItem key={item.id} item={item} />)}
   </ul>
 )
