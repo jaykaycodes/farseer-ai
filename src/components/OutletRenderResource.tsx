@@ -7,7 +7,6 @@ import { IOutletConfig, OutletType } from '~schemas'
 
 import airtable from 'data-base64:~assets/outletIcons/airtable.png'
 
-console.log
 export const OutletRenderResource: Record<
   OutletType,
   {
