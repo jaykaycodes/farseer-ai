@@ -6,6 +6,7 @@ import { Trash2Icon, XIcon } from 'lucide-react'
 import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
+import ActionFooterLayout from '~components/ActionFooterLayout'
 import NativeSelectField from '~components/fields/NativeSelectField'
 import TextAreaField from '~components/fields/TextAreaField'
 import TextField from '~components/fields/TextField'
@@ -141,26 +142,10 @@ const EditFieldPage = () => {
   }
 
   return (
-    <div className="-mb-3">
-      <FormProvider {...form}>
-        <form onBlur={saveForm} className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}>
-          <TextField
-            label="Field name"
-            error={form.formState.errors.name?.message}
-            placeholder="field_name"
-            autoComplete="off"
-            {...form.register('name')}
-          />
-
-          <TextAreaField
-            label="Field hint"
-            error={form.formState.errors.hint?.message}
-            placeholder="What should this field contain?"
-            {...form.register('hint')}
-          />
-          <AdvancedFieldSettings showing={showingAdvanced} />
-
-          <div className="bg-base-100 sticky bottom-0 w-full">
+    <FormProvider {...form}>
+      <ActionFooterLayout
+        actionFooter={
+          <>
             <Transition
               show={showingTestResult}
               enter=" transform ease-out duration-100"
@@ -205,10 +190,28 @@ const EditFieldPage = () => {
                 Test
               </button>
             </div>
-          </div>
+          </>
+        }
+      >
+        <form onBlur={saveForm} className={tw('mt-3 space-y-2', form.formState.isSubmitting && 'disabled')}>
+          <TextField
+            label="Field name"
+            error={form.formState.errors.name?.message}
+            placeholder="field_name"
+            autoComplete="off"
+            {...form.register('name')}
+          />
+
+          <TextAreaField
+            label="Field hint"
+            error={form.formState.errors.hint?.message}
+            placeholder="What should this field contain?"
+            {...form.register('hint')}
+          />
+          <AdvancedFieldSettings showing={showingAdvanced} />
         </form>
-      </FormProvider>
-    </div>
+      </ActionFooterLayout>
+    </FormProvider>
   )
 }
 

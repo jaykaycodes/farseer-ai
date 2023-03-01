@@ -3,7 +3,21 @@ import { useStorage } from '@plasmohq/storage/hook'
 import { useMutation } from '@tanstack/react-query'
 
 import { RESULT_STORAGE_KEY } from '~lib/constants'
-import { GenerateResponseSchema, IGenerateRequest, IGenerateResponse, IResult } from '~schemas'
+import {
+  GenerateResponseSchema,
+  IGenerateRequest,
+  IGenerateResponse,
+  IOutletRequest,
+  IOutletResponse,
+  IResult,
+  OutletResponseSchema,
+} from '~schemas'
+
+import { getProject } from './project.queries'
+
+/**
+ * GENERATE
+ */
 
 async function submitRequest(body: IGenerateRequest): Promise<IResult> {
   const _res = await sendToBackground<IGenerateRequest, IGenerateResponse>({
@@ -24,6 +38,10 @@ async function submitRequest(body: IGenerateRequest): Promise<IResult> {
   throw res.error
 }
 
+export const useSimpleSubmitRequestMutation = () => {
+  return useMutation(submitRequest)
+}
+
 export const SUBMIT_REQUEST_MUTATION_KEY = ['submitRequest']
 export const useSubmitRequestMutation = (persist = false) => {
   const [_, setStore] = useStorage<IResult>(RESULT_STORAGE_KEY, null)
@@ -37,4 +55,31 @@ export const useSubmitRequestMutation = (persist = false) => {
       // queryClient.invalidateQueries(Q.project.list.queryKey)
     },
   })
+}
+
+/**
+ * EXPORTS
+ */
+
+async function exportResult({ projectId, result }: { projectId: string; result: IResult }): Promise<IOutletResponse[]> {
+  if (!result) {
+    throw new Error('No result to export!')
+  }
+  // Grab outlets for project
+  const project = await getProject(projectId)
+  // Build our requests
+  const requests = project.outlets.map((config) =>
+    sendToBackground<IOutletRequest, IOutletResponse>({ name: 'send-to-outlet', body: { config, result } }).then(
+      (res) => OutletResponseSchema.parse(res),
+    ),
+  )
+  const res = await Promise.all(requests)
+
+  if (res.some((r) => !r.ok)) throw new Error('One or more outlets failed to export the result')
+
+  return res
+}
+
+export const useExportResultMutation = () => {
+  return useMutation(exportResult)
 }

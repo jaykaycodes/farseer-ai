@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { FieldConfigSchema, OutletConfigSchema as OutletConfigSchema } from './project.schema'
+import { FieldConfigSchema, OutletConfigSchema } from './project.schema'
 import { ResultSchema } from './result.schema'
 
 /**
@@ -39,7 +39,7 @@ export const ParsedResultSchema = z.record(z.any())
 export type IParsedResult = z.infer<typeof ParsedResultSchema>
 
 export const OutletRequestSchema = z.object({
-  payload: ParsedResultSchema,
+  result: ParsedResultSchema,
   config: OutletConfigSchema,
 })
 export type IOutletRequest = z.infer<typeof OutletRequestSchema>

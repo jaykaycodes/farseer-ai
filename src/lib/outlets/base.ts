@@ -1,6 +1,6 @@
-import type { IOutletResponse, IParsedResult } from '~schemas'
+import type { IBaseOutletConfig, IOutletResponse, IParsedResult } from '~schemas'
 
-export abstract class OutletBase<OutletConfig> {
+export abstract class OutletBase<OutletConfig extends IBaseOutletConfig> {
   protected cfg: OutletConfig
 
   constructor(cfg: OutletConfig) {
@@ -12,6 +12,7 @@ export abstract class OutletBase<OutletConfig> {
       await this._send(payload)
       return { ok: true }
     } catch (error) {
+      if (process.env.NODE_ENV === 'development') console.error(error)
       if (error instanceof Error) return { ok: false, error: error.message }
       return { ok: false, error: 'Unknown error' }
     }

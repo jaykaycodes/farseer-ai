@@ -7,7 +7,7 @@ export class AirtableOutlet extends OutletBase<IAirtableOutletConfig> {
     const res = await fetch(`https://api.airtable.com/v0/${this.cfg.baseId}/${this.cfg.tableId}`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        Authorization: `Bearer ${this.cfg.authToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -16,6 +16,6 @@ export class AirtableOutlet extends OutletBase<IAirtableOutletConfig> {
       }),
     })
 
-    if (res.status !== 200) throw new Error(res.statusText || 'Unknown error')
+    if (res.status < 200 || res.status >= 300) throw new Error(`${res.status} - ${res.statusText || 'Unknown error'}`)
   }
 }

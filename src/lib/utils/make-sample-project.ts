@@ -6,6 +6,7 @@ export enum ExampleProjectType {
   PDP,
   LINKEDIN,
   ARTICLE,
+  BOOKFACE,
   EMPTY,
 }
 
@@ -13,6 +14,7 @@ export const AllExampleProjects = [
   ExampleProjectType.PDP,
   ExampleProjectType.LINKEDIN,
   ExampleProjectType.ARTICLE,
+  ExampleProjectType.BOOKFACE,
   ExampleProjectType.EMPTY,
 ]
 
@@ -72,6 +74,16 @@ const factories: Record<ExampleProjectType, FactoryFn> = {
         makeBaseField({ name: 'author', hint: "the author's name" }),
         makeBaseField({ name: 'date', hint: 'get the date this article was published on' }),
         makeBaseField({ name: 'summary', hint: 'a short summary of this article' }),
+      ],
+      ...overrides,
+    }),
+  [ExampleProjectType.BOOKFACE]: (overrides) =>
+    makeBaseProject({
+      name: 'Bookface Page Collector',
+      fields: [
+        makeBaseField({ name: 'poster', hint: 'get the author of the post' }),
+        makeBaseField({ name: 'company', hint: 'get the company name where the author works' }),
+        makeBaseField({ name: 'summary', hint: 'summarize this article' }),
       ],
       ...overrides,
     }),

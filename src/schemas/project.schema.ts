@@ -2,24 +2,32 @@ import { z } from 'zod'
 
 export enum OutletType {
   Airtable = 'airtable',
-  CSV = 'csv',
+  HTTP = 'http',
 }
 
-export const CsvOutletSchema = z.object({
-  type: z.literal(OutletType.CSV),
+export const BaseOutletSchema = z.object({
   id: z.string(),
+  type: z.nativeEnum(OutletType),
 })
-export type ICsvOutletConfig = z.infer<typeof CsvOutletSchema>
 
-export const AirtableOutletSchema = z.object({
+export type IBaseOutletConfig = z.infer<typeof BaseOutletSchema>
+
+export const HttpOutletSchema = BaseOutletSchema.extend({
+  type: z.literal(OutletType.HTTP),
+  url: z.string().url(),
+  // secret: z.string(),
+})
+export type IHttpOutlet = z.infer<typeof HttpOutletSchema>
+
+export const AirtableOutletSchema = BaseOutletSchema.extend({
   type: z.literal(OutletType.Airtable),
-  id: z.string(),
   baseId: z.string(),
   tableId: z.string(),
+  authToken: z.string(),
 })
 export type IAirtableOutletConfig = z.infer<typeof AirtableOutletSchema>
 
-export const OutletConfigSchema = z.discriminatedUnion('type', [AirtableOutletSchema, CsvOutletSchema])
+export const OutletConfigSchema = z.discriminatedUnion('type', [AirtableOutletSchema, HttpOutletSchema])
 export type IOutletConfig = z.infer<typeof OutletConfigSchema>
 
 export const FieldConfigSchema = z.object({
