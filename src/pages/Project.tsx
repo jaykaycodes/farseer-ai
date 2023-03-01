@@ -1,13 +1,14 @@
-import { ReactNode, useMemo } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
 import { createId } from '@paralleldrive/cuid2'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
 import classnames from 'classnames'
-import { ChevronRightIcon, FilePlus2Icon, WebhookIcon } from 'lucide-react'
+import { ChevronRightIcon, FilePlus2Icon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Link, LoaderFunctionArgs, To, useNavigate, useParams } from 'react-router-dom'
 
 import TextField from '~components/fields/TextField'
+import { OutletRenderResource } from '~components/OutletRenderResource'
 import { RESULT_STORAGE_KEY } from '~lib/constants'
 import { tw } from '~lib/utils'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
@@ -22,8 +23,6 @@ import {
   useUpdateProjectMutation,
 } from '~queries'
 import { GenerateRequestSchema, IGenerateRequest, OutletType } from '~schemas'
-
-import airtable from 'data-base64:~assets/outletIcons/airtable.png'
 
 const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
@@ -288,19 +287,10 @@ const ButtonListItem = ({
 }: {
   item: LinkItem<{ type: OutletType }>
 }) => {
-  const icon = useMemo(() => {
-    switch (type) {
-      case 'airtable':
-        return <img className={'mx-auto'} src={airtable} width={30} height={30} alt="airtable icon" />
-      case 'http':
-        return <WebhookIcon className={'mx-auto'} size={30} />
-    }
-  }, [type])
-
   return (
     <Link to={to}>
       <li className="hover:bg-base-200 rounded border py-3 shadow">
-        {icon}
+        {OutletRenderResource[type].icon(30, { className: 'mx-auto' })}
         <h3 className="mt-2 text-center text-xs font-semibold uppercase leading-none">{type}</h3>
       </li>
     </Link>

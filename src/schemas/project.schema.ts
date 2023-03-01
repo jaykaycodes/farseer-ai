@@ -14,7 +14,7 @@ export type IBaseOutletConfig = z.infer<typeof BaseOutletSchema>
 
 export const HttpOutletSchema = BaseOutletSchema.extend({
   type: z.literal(OutletType.HTTP),
-  endpoint: z.string().url(),
+  url: z.string().url(),
   // secret: z.string(),
 })
 export type IHttpOutlet = z.infer<typeof HttpOutletSchema>

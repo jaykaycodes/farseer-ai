@@ -4,7 +4,7 @@ import { OutletBase } from './base'
 
 export class HTTPOutlet extends OutletBase<IHttpOutlet> {
   async _send(_payload: IParsedResult): Promise<any> {
-    const res = await fetch(this.cfg.endpoint, {
+    const res = await fetch(this.cfg.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
