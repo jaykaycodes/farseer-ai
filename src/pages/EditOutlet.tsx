@@ -2,13 +2,13 @@ import { useMemo } from 'react'
 import { Tab } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import classnames from 'classnames'
 import { Trash2Icon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import ActionFooterLayout from '~components/ActionFooterLayout'
 import { OutletRenderResource } from '~components/OutletRenderResource'
+import { tw } from '~lib/utils'
 import { Q, queryClient, useDeleteOutletMutation, useUpdateOutletMutation } from '~queries'
 import { IOutletConfig, OutletConfigSchema, OutletType } from '~schemas'
 
@@ -68,7 +68,7 @@ const EditOutletPage = () => {
               <Tab
                 key={`selection-${key}-${idx}`}
                 className={({ selected }) =>
-                  classnames(
+                  tw(
                     //Todo: Add focus state
                     'rounded border py-3 shadow',
                     selected && 'bg-base-200',

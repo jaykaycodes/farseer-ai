@@ -12,7 +12,7 @@ export class AirtableOutlet extends OutletBase<IAirtableOutletConfig> {
       },
       body: JSON.stringify({
         // TODO - get fields from cfg? or just use payload?
-        records: [{ fields: { url: payload.url, time: new Date().toLocaleTimeString(), ...payload } }],
+        records: [{ fields: payload }],
       }),
     })
 

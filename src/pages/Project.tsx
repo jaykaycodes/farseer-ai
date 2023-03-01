@@ -2,7 +2,6 @@ import { Disclosure, Transition } from '@headlessui/react'
 import { createId } from '@paralleldrive/cuid2'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
-import classnames from 'classnames'
 import { ChevronRightIcon, FilePlus2Icon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, LoaderFunctionArgs, To, useNavigate, useParams } from 'react-router-dom'
@@ -193,7 +192,7 @@ const ProjectPage = () => {
 
       <div className="mt-auto flex w-full justify-end gap-x-1">
         {result && (
-          <Link to="/results" className="btn btn-sm btn-outline">
+          <Link to="results" className="btn btn-sm btn-outline">
             Show Results
           </Link>
         )}
@@ -304,10 +303,10 @@ const LinkList = ({
   | { items: LinkItem<{ type: OutletType }>[]; type: 'button' }
   | { items: LinkItem<{ title: string; subtitle?: string }>[]; type: 'row' }) => (
   <ul
-    className={classnames(
+    className={tw(
       'max-h-[200px] overflow-y-auto',
       type === 'row' && 'divide-base-200 divide-y',
-      type === 'button' && 'grid grid-cols-3 gap-6 mx-2',
+      type === 'button' && 'mx-2 grid grid-cols-3 gap-6',
     )}
   >
     {type === 'row'
