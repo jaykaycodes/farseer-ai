@@ -87,9 +87,9 @@ const ProjectPage = () => {
       outlet: {
         id,
         type: OutletType.Airtable,
-        baseId: 'app123',
-        tableId: 'table123',
-        authToken: 'auth123',
+        baseId: '',
+        tableId: '',
+        authToken: '',
       },
     })
     navigate(`outlet/${id}`)
@@ -312,7 +312,7 @@ const LinkList = ({
     className={tw(
       'max-h-[200px] overflow-y-auto',
       type === 'row' && 'divide-base-200 divide-y',
-      type === 'button' && 'mx-2 grid grid-cols-3 gap-6',
+      type === 'button' && 'mx-2 grid grid-cols-3 gap-2',
     )}
   >
     {type === 'row'

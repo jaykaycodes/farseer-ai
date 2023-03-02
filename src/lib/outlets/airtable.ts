@@ -11,7 +11,6 @@ export class AirtableOutlet extends OutletBase<IAirtableOutletConfig> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // TODO - get fields from cfg? or just use payload?
         records: [{ fields: payload }],
       }),
     })

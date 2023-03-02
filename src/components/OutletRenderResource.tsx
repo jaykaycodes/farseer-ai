@@ -20,7 +20,7 @@ export const OutletRenderResource: Record<
     ),
     form: (register: UseFormRegister<IOutletConfig>) => (
       <>
-        <TextField label="API Key" placeholder="tblXVIPnMb0zDu3Hv" autoComplete="off" {...register('authToken')} />
+        <TextField label="API Key" placeholder="personal-api-key" autoComplete="off" {...register('authToken')} />
         <TextField label="Base ID" placeholder="appoodzGBt25yz8UE" autoComplete="off" {...register('baseId')} />
         <TextField label="Table ID" placeholder="tblXVIPnMb0zDu3Hv" autoComplete="off" {...register('tableId')} />
         <TextField
