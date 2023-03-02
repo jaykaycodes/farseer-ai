@@ -1,14 +1,14 @@
+import { ReactNode, useEffect } from 'react'
 import { Disclosure, Transition } from '@headlessui/react'
 import { createId } from '@paralleldrive/cuid2'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon, FilePlus2Icon } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { Link, LoaderFunctionArgs, To, useNavigate, useParams } from 'react-router-dom'
 
 import TextField from '~components/fields/TextField'
 import { OutletRenderResource } from '~components/OutletRenderResource'
-import { RESULT_STORAGE_KEY } from '~lib/constants'
+import { StorageKeys } from '~lib/constants'
 import { tw } from '~lib/utils'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import {
@@ -21,14 +21,20 @@ import {
   useSubmitRequestMutation,
   useUpdateProjectMutation,
 } from '~queries'
-import { GenerateRequestSchema, IGenerateRequest, OutletType } from '~schemas'
+import { GenerateRequestSchema, IGenerateRequest, IResult, OutletType } from '~schemas'
 
 const projectQuery = (projectId: string) => Q.project.detail(projectId)
 
 const ProjectPage = () => {
-  const [result] = useStorage(RESULT_STORAGE_KEY)
-  const navigate = useNavigate()
+  const [result] = useStorage<IResult>(StorageKeys.RESULTS)
+  const [_, setRecentProjectId] = useStorage<string>(StorageKeys.RECENT_PROJECT)
   const projectId = useParams().projectId!
+
+  useEffect(() => {
+    setRecentProjectId(projectId)
+  }, [projectId])
+
+  const navigate = useNavigate()
   const {
     mutateAsync: submitRequest,
     isLoading: isSubmitting,

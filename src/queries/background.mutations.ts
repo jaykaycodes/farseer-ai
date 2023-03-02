@@ -2,7 +2,7 @@ import { sendToBackground } from '@plasmohq/messaging'
 import { useStorage } from '@plasmohq/storage/hook'
 import { useMutation } from '@tanstack/react-query'
 
-import { RESULT_STORAGE_KEY } from '~lib/constants'
+import { StorageKeys } from '~lib/constants'
 import {
   GenerateResponseSchema,
   IGenerateRequest,
@@ -44,7 +44,7 @@ export const useSimpleSubmitRequestMutation = () => {
 
 export const SUBMIT_REQUEST_MUTATION_KEY = ['submitRequest']
 export const useSubmitRequestMutation = (persist = false) => {
-  const [_, setStore] = useStorage<IResult>(RESULT_STORAGE_KEY, null)
+  const [_, setStore] = useStorage<IResult>(StorageKeys.RESULTS, null)
 
   return useMutation({
     mutationKey: persist ? SUBMIT_REQUEST_MUTATION_KEY : undefined,

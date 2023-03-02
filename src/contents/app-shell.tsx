@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { throttle } from 'lodash-es'
 import { XIcon } from 'lucide-react'
 
-import { APP_MESSAGES } from '~lib/constants'
+import { AppMessages } from '~lib/constants'
 import { tw } from '~lib/utils'
 
 import { APP_WINDOW_DIMS } from '../lib/constants'
@@ -22,7 +22,7 @@ function AppShell() {
   // Setup listener for messages from background script
   useEffect(() => {
     const recvMsg = throttle((msg: unknown) => {
-      if (msg === APP_MESSAGES.TOGGLE_PLUGIN_VISIBILITY) setShow((p) => !p)
+      if (msg === AppMessages.TOGGLE_PLUGIN_VISIBILITY) setShow((p) => !p)
     }, 50)
 
     chrome.runtime.onMessage.addListener(recvMsg)

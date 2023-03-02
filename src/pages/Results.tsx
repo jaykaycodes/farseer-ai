@@ -4,7 +4,7 @@ import { useIsMutating } from '@tanstack/react-query'
 import { XIcon } from 'lucide-react'
 import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
-import { RESULT_STORAGE_KEY } from '~lib/constants'
+import { StorageKeys } from '~lib/constants'
 import { tw } from '~lib/utils'
 import { SUBMIT_REQUEST_MUTATION_KEY, useExportResultMutation } from '~queries'
 import type { IResult } from '~schemas'
@@ -12,7 +12,7 @@ import type { IResult } from '~schemas'
 const ResultsPage = () => {
   const navigate = useNavigate()
   const isMutating = 1 === useIsMutating({ mutationKey: SUBMIT_REQUEST_MUTATION_KEY, exact: true })
-  const [result] = useStorage<IResult>(RESULT_STORAGE_KEY, {})
+  const [result] = useStorage<IResult>(StorageKeys.RESULTS, {})
 
   const projectId = useParams().projectId!
   const {

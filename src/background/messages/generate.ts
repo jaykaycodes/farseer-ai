@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
 
-import { APP_MESSAGES } from '~lib/constants'
+import { AppMessages } from '~lib/constants'
 import type { IGenerateRequest, IGenerateResponse, IResult } from '~schemas'
 
 const HTML_CHAR_LIMIT = 10000
@@ -14,7 +14,7 @@ const extractActiveTabContent = (): Promise<string> =>
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTabId = tabs[0].id
       if (!activeTabId) return reject('No active tab!')
-      chrome.tabs.sendMessage(activeTabId, APP_MESSAGES.EXTRACT_CONTENT, resolve)
+      chrome.tabs.sendMessage(activeTabId, AppMessages.EXTRACT_CONTENT, resolve)
     })
   })
 

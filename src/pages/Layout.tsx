@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Storage } from '@plasmohq/storage'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronLeftIcon, FilePlus2Icon, RecycleIcon } from 'lucide-react'
 import {
@@ -13,6 +14,7 @@ import {
 } from 'react-router-dom'
 
 import { SelectList } from '~components/fields/SelectField'
+import { StorageKeys } from '~lib/constants'
 import { makeExampleProject, tw } from '~lib/utils'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import { Q, queryClient, resetProjects, useCreateProjectMutation, useResetProjectsMutation } from '~queries'
@@ -108,16 +110,19 @@ const Layout = () => {
 
 export default Layout
 
+const storage = new Storage()
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const projects = await queryClient.fetchQuery({ ...projectsQuery, staleTime: Infinity })
 
   if (projects.length === 0) {
     await resetProjects()
     return redirect(`/${projects[0].id}`)
-  } else if (!params.projectId || !projects.find((p) => p.id === params.projectId)) {
-    // TODO load last project id from storage
+  }
+
+  if (!params.projectId || !projects.find((p) => p.id === params.projectId)) {
+    const projectId = (await storage.get(StorageKeys.RECENT_PROJECT)) ?? projects[0].id
     console.log('No projectId found! Redirecting to', projects[0].id)
-    return redirect(`/${projects[0].id}`)
+    return redirect(`/${projectId}`)
   }
 
   return projects
