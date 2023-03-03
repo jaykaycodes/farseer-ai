@@ -1,6 +1,6 @@
 import { createContext, useEffect } from 'react'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
-import posthog from 'posthog-js'
+import posthog, { PostHog } from 'posthog-js'
 import { createMemoryRouter, Outlet, RouterProvider, useLocation } from 'react-router-dom'
 
 import { APP_WINDOW_DIMS } from '~lib/constants'
@@ -13,7 +13,7 @@ import { Q, queryClient } from '~queries'
 
 import '~tailwind.css'
 
-export const ParentContext = createContext<string | null>(null)
+export const ParentContext = createContext<{ $current_url: string; $pathname: string; $host: string } | null>(null)
 const urlQuery = Q.background.url
 
 const ParentProvider = () => {
@@ -36,7 +36,7 @@ const ParentProvider = () => {
   }, [isSuccess])
 
   return (
-    <ParentContext.Provider value={url}>
+    <ParentContext.Provider value={properties}>
       <Outlet />
     </ParentContext.Provider>
   )
@@ -95,6 +95,11 @@ const App = () => {
         capture_performance: false,
         capture_pageview: false,
         capture_pageleave: false,
+        disable_session_recording: true,
+        loaded: function (posthog: PostHog) {
+          // identify user goes here
+          // posthog.identify('[user unique id]')
+        },
         debug: true,
       })
     }
