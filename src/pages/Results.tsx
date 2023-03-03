@@ -6,7 +6,7 @@ import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import { StorageKeys } from '~lib/constants'
 import { tw } from '~lib/utils'
-import { useAnalytics } from '~lib/utils/use-analytics'
+import { useAnalytics } from '~lib/analytics/use-analytics'
 import { SUBMIT_REQUEST_MUTATION_KEY, useExportResultMutation } from '~queries'
 import type { IResult } from '~schemas'
 

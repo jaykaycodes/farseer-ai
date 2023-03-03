@@ -27,11 +27,13 @@ const ParentProvider = () => {
 
   useEffect(() => {
     if (isInitialLoading) return
+    // This cannot use the analytics since it's outside of the context provider
     posthog.capture('$pageview', properties)
   }, [location, isInitialLoading])
 
   useEffect(() => {
     if (isSuccess) {
+      // Same as above
       posthog.capture('extension_open', properties)
     }
   }, [isSuccess])
@@ -88,6 +90,7 @@ export const router = createMemoryRouter([
 
 const App = () => {
   useEffect(initAnalytics, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <div style={{ ...APP_WINDOW_DIMS }} className="flex flex-col overflow-auto">

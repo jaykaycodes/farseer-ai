@@ -31,24 +31,6 @@ function AppShell() {
 
   if (!show) return null
 
-  // useEffect(() => {
-  //   const iframeMessenger = function (event: MessageEvent<any>) {
-  //     if (event.origin === 'chrome-extension://dopmfpkipmohdfmopbhfmpchnpnahnad') {
-  //       console.log(event)
-  //       chrome.runtime.sendMessage(
-  //         {
-  //           type: 'url',
-  //           payload: window.location.href,
-  //         },
-  //         (response) => {
-  //           console.log(response)
-  //         },
-  //       )
-  //     }
-  //   }
-  //   window.addEventListener('message', iframeMessenger)
-  //   return () => window.removeEventListener('message', iframeMessenger)
-  // }, [])
   return (
     <div
       data-theme="emerald"

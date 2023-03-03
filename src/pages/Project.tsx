@@ -10,7 +10,7 @@ import TextField from '~components/fields/TextField'
 import { OutletRenderResource } from '~components/OutletRenderResource'
 import { StorageKeys } from '~lib/constants'
 import { tw } from '~lib/utils'
-import { useAnalytics } from '~lib/utils/use-analytics'
+import { useAnalytics } from '~lib/analytics/use-analytics'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import {
   Q,
