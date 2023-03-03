@@ -31,6 +31,22 @@ function AppShell() {
 
   if (!show) return null
 
+  useEffect(() => {
+    const iframeMessenger = function(event) {
+      if (event.origin === 'chrome-extension://dopmfpkipmohdfmopbhfmpchnpnahnad') {
+        console.log(event)
+        chrome.runtime.sendMessage({
+          type: "url",
+          payload: window.location.href,
+        })
+      }
+    }
+    window.addEventListener('test', iframeMessenger)
+  return () => window.removeEventListener('test', iframeMessenger)
+  
+  }, [])  
+
+
   return (
     <div
       data-theme="emerald"

@@ -66,6 +66,16 @@ const App = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const recvMsg = (msg: any) => {
+      console.log(msg)
+    }
+
+    chrome.runtime.onMessage.addListener(recvMsg)
+    window.parent.postMessage("test", "*")
+    return () => chrome.runtime.onMessage.removeListener(recvMsg)
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <div style={{ ...APP_WINDOW_DIMS }} className="flex flex-col overflow-auto">
