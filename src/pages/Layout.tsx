@@ -21,7 +21,6 @@ import { Q, queryClient, resetProjects, useCreateProjectMutation, useResetProjec
 
 const assertHandle = (handle: unknown): handle is Record<string, unknown> => Boolean(handle)
 const projectsQuery = Q.project.list
-const urlQuery = Q.background.url
 
 const Layout = () => {
   const navigate = useNavigate()
@@ -29,9 +28,6 @@ const Layout = () => {
   const projectId = useParams().projectId!
   const matches = useMatches()
   const rootMatch = useMatch('/:projectId')
-
-  const { data: url } = useQuery(urlQuery)
-  console.log(url)
 
   const showReset = useIsKeypressed('Shift') && process.env.NODE_ENV === 'development'
 
