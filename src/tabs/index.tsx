@@ -1,8 +1,9 @@
 import { createContext, useEffect } from 'react'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
-import posthog, { PostHog } from 'posthog-js'
+import posthog from 'posthog-js'
 import { createMemoryRouter, Outlet, RouterProvider, useLocation } from 'react-router-dom'
 
+import { initAnalytics } from '~lib/analytics'
 import { APP_WINDOW_DIMS } from '~lib/constants'
 import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
 import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
@@ -86,46 +87,7 @@ export const router = createMemoryRouter([
 ])
 
 const App = () => {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      // services to set up on initial show
-      posthog.init('phc_mJ3okP8NlaYiTig5EInaCIjcKCSXK8kv43EWrUcQxBh', {
-        api_host: 'https://app.posthog.com',
-        autocapture: false,
-        capture_performance: false,
-        capture_pageview: false,
-        capture_pageleave: false,
-        disable_session_recording: true,
-        loaded: function (posthog: PostHog) {
-          // identify user goes here
-          // posthog.identify('[user unique id]')
-        },
-        debug: true,
-      })
-    }
-  }, [])
-
-  // useEffect(() => {
-  //   const recvMsg = (
-  //     msg: MessageEvent<{
-  //       type: 'url'
-  //       url: string
-  //     }>,
-  //     sender: chrome.runtime.MessageSender,
-  //     sendResponse: (response?: unknown) => void,
-  //   ) => {
-  //     if (msg.type === 'url') {
-  //       console.log(msg)
-  //       console.log(sender.tab?.id)
-  //       sendResponse({ ok: true })
-  //     }
-  //   }
-
-  //   chrome.runtime.onMessage.addListener(recvMsg)
-  //   // window.parent.postMessage('message', '*')
-  //   return () => chrome.runtime.onMessage.removeListener(recvMsg)
-  // }, [])
-
+  useEffect(initAnalytics, [])
   return (
     <QueryClientProvider client={queryClient}>
       <div style={{ ...APP_WINDOW_DIMS }} className="flex flex-col overflow-auto">
