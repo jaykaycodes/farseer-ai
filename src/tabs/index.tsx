@@ -66,15 +66,26 @@ const App = () => {
     }
   }, [])
 
-  useEffect(() => {
-    const recvMsg = (msg: any) => {
-      console.log(msg)
-    }
+  // useEffect(() => {
+  //   const recvMsg = (
+  //     msg: MessageEvent<{
+  //       type: 'url'
+  //       url: string
+  //     }>,
+  //     sender: chrome.runtime.MessageSender,
+  //     sendResponse: (response?: unknown) => void,
+  //   ) => {
+  //     if (msg.type === 'url') {
+  //       console.log(msg)
+  //       console.log(sender.tab?.id)
+  //       sendResponse({ ok: true })
+  //     }
+  //   }
 
-    chrome.runtime.onMessage.addListener(recvMsg)
-    window.parent.postMessage("test", "*")
-    return () => chrome.runtime.onMessage.removeListener(recvMsg)
-  }, [])
+  //   chrome.runtime.onMessage.addListener(recvMsg)
+  //   window.parent.postMessage('message', '*')
+  //   return () => chrome.runtime.onMessage.removeListener(recvMsg)
+  // }, [])
 
   return (
     <QueryClientProvider client={queryClient}>

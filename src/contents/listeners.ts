@@ -12,3 +12,8 @@ chrome.runtime.onMessage.addListener((msg, _, res) => {
   const doc = parser.doc2Html4Prompt(document)
   res(doc)
 })
+
+chrome.runtime.onMessage.addListener((msg, _, res) => {
+  if (msg !== AppMessages.GET_URL) return
+  res(window.location.href)
+})
