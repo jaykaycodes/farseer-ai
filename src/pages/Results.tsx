@@ -6,6 +6,7 @@ import { LoaderFunctionArgs, useNavigate, useParams } from 'react-router-dom'
 
 import { StorageKeys } from '~lib/constants'
 import { tw } from '~lib/utils'
+import { useAnalytics } from '~lib/analytics/use-analytics'
 import { SUBMIT_REQUEST_MUTATION_KEY, useExportResultMutation } from '~queries'
 import type { IResult } from '~schemas'
 
@@ -23,10 +24,14 @@ const ResultsPage = () => {
     error,
   } = useExportResultMutation()
 
+  const { capture } = useAnalytics()
+
   const handleExport = () => {
     if (!result || !projectId) return
-
     exportResult({ projectId, result })
+      .then((res) => capture('export_response', { response_ok: true, ...res }))
+      .catch((err) => capture('export_response', { response_ok: false, response_err: err }))
+    capture('export_request', { projectId })
   }
 
   useEffect(() => {
@@ -55,7 +60,7 @@ const ResultsPage = () => {
       </table>
       <div className="bg-base-100 sticky bottom-0 w-full">
         {/* Temporary Feedback */}
-        <div className="flex items-center justify-between p-3 ">
+        <div className="flex items-center justify-between space-x-4 p-3 ">
           <div>
             {isSendingExport && <div className="base-300 text-sm">Sending...</div>}
             {isSuccessExport && <div className="text-success text-sm">Sent</div>}

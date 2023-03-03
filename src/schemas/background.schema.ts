@@ -54,3 +54,15 @@ export const OutletResponseSchema = z.discriminatedUnion('ok', [
   }),
 ])
 export type IOutletResponse = z.infer<typeof OutletResponseSchema>
+
+export const UrlResponseSchema = z.discriminatedUnion('ok', [
+  z.object({
+    ok: z.literal(false),
+    error: z.string(),
+  }),
+  z.object({
+    ok: z.literal(true),
+    url: z.string(),
+  }),
+])
+export type IUrlResponseSchema = z.infer<typeof UrlResponseSchema>

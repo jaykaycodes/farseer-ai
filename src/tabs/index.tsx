@@ -1,25 +1,58 @@
-import { useEffect } from 'react'
-import { QueryClientProvider } from '@tanstack/react-query'
+import { createContext, useEffect } from 'react'
+import { QueryClientProvider, useQuery } from '@tanstack/react-query'
 import posthog from 'posthog-js'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { createMemoryRouter, Outlet, RouterProvider, useLocation } from 'react-router-dom'
 
+import { initAnalytics } from '~lib/analytics'
 import { APP_WINDOW_DIMS } from '~lib/constants'
 import EditFieldPage, { loader as editFieldLoader } from '~pages/EditField'
 import EditOutletPage, { loader as editOutletLoader } from '~pages/EditOutlet'
 import Layout, { loader as layoutLoader } from '~pages/Layout'
 import ProjectPage, { loader as projectLoader } from '~pages/Project'
 import ResultsPage, { loader as resultsLoader } from '~pages/Results'
-import { queryClient } from '~queries'
+import { Q, queryClient } from '~queries'
 
 import '~tailwind.css'
+
+export const ParentContext = createContext<{ $current_url: string; $pathname: string; $host: string } | null>(null)
+const urlQuery = Q.background.url
+
+const ParentProvider = () => {
+  const { data, isInitialLoading, isSuccess } = useQuery(urlQuery)
+  const location = useLocation()
+
+  const url = data?.ok ? data.url : 'unavailable'
+  // more custom properties breaking down the url
+  const properties = { $current_url: location.pathname, $pathname: location.pathname, $host: url }
+
+  useEffect(() => {
+    if (isInitialLoading) return
+    // This cannot use the analytics since it's outside of the context provider
+    posthog.capture('$pageview', properties)
+  }, [location, isInitialLoading])
+
+  useEffect(() => {
+    if (isSuccess) {
+      // Same as above
+      posthog.capture('extension_open', properties)
+    }
+  }, [isSuccess])
+
+  return (
+    <ParentContext.Provider value={properties}>
+      <Outlet />
+    </ParentContext.Provider>
+  )
+}
 
 export const router = createMemoryRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <ParentProvider />,
     loader: layoutLoader,
     children: [
       {
+        element: <Layout />,
         path: ':projectId',
         children: [
           {
@@ -45,26 +78,18 @@ export const router = createMemoryRouter([
           },
         ],
       },
+      // Results renders its own layout
+      {
+        path: ':projectId/results',
+        element: <ResultsPage />,
+        loader: resultsLoader,
+      },
     ],
-  },
-  // Results renders its own layout
-  {
-    path: ':projectId/results',
-    element: <ResultsPage />,
-    loader: resultsLoader,
   },
 ])
 
 const App = () => {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      // services to set up on initial show
-      posthog.init('phc_mJ3okP8NlaYiTig5EInaCIjcKCSXK8kv43EWrUcQxBh', {
-        api_host: 'https://app.posthog.com',
-        autocapture: false,
-      })
-    }
-  }, [])
+  useEffect(initAnalytics, [])
 
   return (
     <QueryClientProvider client={queryClient}>

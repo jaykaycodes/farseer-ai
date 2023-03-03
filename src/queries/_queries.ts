@@ -4,6 +4,7 @@
 
 import { mergeQueryKeys } from '@lukemorales/query-key-factory'
 
+import { backgroundQueries } from './background.queries'
 import { projectQueries } from './project.queries'
 
-export default mergeQueryKeys(projectQueries)
+export default mergeQueryKeys(projectQueries, backgroundQueries)

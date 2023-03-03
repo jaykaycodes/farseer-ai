@@ -10,6 +10,7 @@ import TextField from '~components/fields/TextField'
 import { OutletRenderResource } from '~components/OutletRenderResource'
 import { StorageKeys } from '~lib/constants'
 import { tw } from '~lib/utils'
+import { useAnalytics } from '~lib/analytics/use-analytics'
 import { useIsKeypressed } from '~lib/utils/use-is-keypressed'
 import {
   Q,
@@ -51,6 +52,7 @@ const ProjectPage = () => {
   const { mutateAsync: updateProject } = useUpdateProjectMutation()
 
   const __skip_open_ai__ = useIsKeypressed('Shift') && process.env.NODE_ENV === 'development'
+  const { capture, flattenFields, flattenResults } = useAnalytics()
 
   const handleSubmit = async () => {
     if (!project) return
@@ -61,8 +63,10 @@ const ProjectPage = () => {
       __skip_open_ai__,
     }
     const data = GenerateRequestSchema.parse(_data)
-
     submitRequest(data)
+      .then((res) => capture('generate_response', flattenResults(res)))
+      .catch((err) => capture('generate_response', { response_ok: false, response_err: err }))
+    capture('generate_request', flattenFields(data.fields))
     navigate(`/${projectId}/results`)
   }
 
@@ -77,6 +81,7 @@ const ProjectPage = () => {
         refinements: [{ rule: '' }],
       },
     })
+    capture('field_create', { projectId, fieldId: id })
     navigate(`field/${id}`)
   }
 
@@ -92,12 +97,14 @@ const ProjectPage = () => {
         authToken: '',
       },
     })
+    capture('outlet_create', { projectId, outletId: id })
     navigate(`outlet/${id}`)
   }
 
   const handleDeleteProject = async () => {
     const index = projects?.findIndex((p) => p.id === projectId) ?? 0
     deleteProject({ projectId })
+    capture('project_delete', { projectId })
     if (projects) navigate(`/${projects[index > 0 ? index - 1 : 0].id}`)
   }
 
@@ -105,6 +112,7 @@ const ProjectPage = () => {
     if (!project) return
     const id = createId()
     await duplicateProject({ ...project, id })
+    capture('project_duplicate', { projectId, newProjectId: id })
     navigate(`/${id}`)
   }
 
@@ -229,32 +237,44 @@ interface SectionProps {
   children: ReactNode
 }
 
-const Section = ({ title, action, children }: SectionProps) => (
-  <Disclosure>
-    {({ open }) => (
-      <>
-        <Disclosure.Button as="div" className="flex cursor-default items-center gap-x-2">
-          <div className="inline-flex cursor-pointer items-center">
-            <ChevronRightIcon className={tw('h-5 w-5 transition-transform', open && 'rotate-90')} />
-            <h2 className="select-none text-lg font-bold leading-none">{title}</h2>
-          </div>
-          {action}
-        </Disclosure.Button>
-        <Transition
-          show={open}
-          enter="transition duration-150 ease-out"
-          enterFrom="transform scale-95 opacity-0"
-          enterTo="transform scale-100 opacity-100"
-          leave="transition duration-150 ease-out"
-          leaveFrom="transform scale-100 opacity-100"
-          leaveTo="transform scale-95 opacity-0"
-        >
-          <Disclosure.Panel className={'mx-4'}>{children}</Disclosure.Panel>
-        </Transition>
-      </>
-    )}
-  </Disclosure>
-)
+const Section = ({ title, action, children }: SectionProps) => {
+  const { capture } = useAnalytics()
+  return (
+    <Disclosure>
+      {({ open }) => (
+        <>
+          <Disclosure.Button
+            onClickCapture={() =>
+              capture(`${title.toLocaleLowerCase()}Foldable_${open ? 'close' : 'open'}`, {
+                title,
+                action: open ? 'close' : 'open',
+              })
+            }
+            as="div"
+            className="flex cursor-default items-center gap-x-2"
+          >
+            <div className="inline-flex cursor-pointer items-center">
+              <ChevronRightIcon className={tw('h-5 w-5 transition-transform', open && 'rotate-90')} />
+              <h2 className="select-none text-lg font-bold leading-none">{title}</h2>
+            </div>
+            {action}
+          </Disclosure.Button>
+          <Transition
+            show={open}
+            enter="transition duration-150 ease-out"
+            enterFrom="transform scale-95 opacity-0"
+            enterTo="transform scale-100 opacity-100"
+            leave="transition duration-150 ease-out"
+            leaveFrom="transform scale-100 opacity-100"
+            leaveTo="transform scale-95 opacity-0"
+          >
+            <Disclosure.Panel className={'mx-4'}>{children}</Disclosure.Panel>
+          </Transition>
+        </>
+      )}
+    </Disclosure>
+  )
+}
 
 interface LinkItem<ItemArgs> {
   to: To

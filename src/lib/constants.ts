@@ -1,6 +1,7 @@
 export enum AppMessages {
   TOGGLE_PLUGIN_VISIBILITY = 'TOGGLE_PLUGIN_VISIBILITY',
   EXTRACT_CONTENT = 'EXTRACT_CONTENT',
+  GET_URL = 'GET_URL',
 }
 
 export enum StorageKeys {
