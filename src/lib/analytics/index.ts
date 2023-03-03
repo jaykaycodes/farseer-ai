@@ -26,7 +26,8 @@ export function initAnalytics() {
           }
         })
       },
-      debug: true,
+      // if needed for debugging
+      // debug: true,
     })
   }
 }
