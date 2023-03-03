@@ -1,8 +1,12 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { OpenAIClient } from 'openai-fetch'
+import { posthog } from 'posthog-js'
 
+import { initAnalytics } from '~lib/analytics'
 import { AppMessages } from '~lib/constants'
 import type { IGenerateRequest, IGenerateResponse, IResult } from '~schemas'
+
+initAnalytics()
 
 const HTML_CHAR_LIMIT = 10000
 
@@ -14,6 +18,7 @@ const extractActiveTabContent = (): Promise<string> =>
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTabId = tabs[0].id
       if (!activeTabId) return reject('No active tab!')
+      posthog.capture('generate', { url: tabs[0].url })
       chrome.tabs.sendMessage(activeTabId, AppMessages.EXTRACT_CONTENT, resolve)
     })
   })
